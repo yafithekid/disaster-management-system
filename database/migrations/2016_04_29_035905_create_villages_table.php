@@ -22,7 +22,7 @@ class CreateVillagesTable extends Migration
             $table->string('district');
             $table->string('province');
         });
-        DB::statement("ALTER TABLE $this->tablename ADD COLUMN geom geometry(Point)");
+        DB::statement("ALTER TABLE $this->tablename ADD COLUMN geom geometry(Polygon)");
         Schema::table("victims",function(Blueprint $table){
             $table->integer("village_id")->unsigned();
             $table->foreign("village_id")->references("id")->on("villages")->onDelete("cascade")->onUpdate("cascade");
