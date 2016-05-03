@@ -3,21 +3,20 @@
 namespace App\Services;
 
 use Illuminate\Database\Connection;
-use Illuminate\Log\Writer;
 
 class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
 {
-    private $db;
-    private $log;
     private $dateService;
     private $query;
 
-    public function __construct(Connection $database,Writer $log,DateService $dateService)
+    private $join_with_disasters = false;
+    private $join_with_disaster_areas = false;
+    private $join_with_villages = false;
+
+    public function __construct(Connection $database,DateService $dateService)
     {
-        $this->db = $database;
-        $this->log = $log;
         $this->dateService = $dateService;
-        $this->query = $this->db->table("disaster_events");
+        $this->query = $database->table("disaster_events");
     }
 
     public function date($date)
@@ -83,25 +82,18 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
 
     public function type($type)
     {
-        $this->query->join("disasters",function($join) use ($type) {
-            $q = $join->on("disaster_events.id", "=", "disasters.id");
-            if ($type !== null){
-                $q->where("disasters.type", $type);
-            }
-        });
+        $this->joinWithDisasters();
+        if ($type != null){
+            $this->query->where("disasters.type","=",$type);
+        }
         return $this;
     }
 
     public function village($village_id)
     {
-        $village = $this->db->table("villages")->where("id","=",$village_id)->first();
-        $this->query->join("disasters",function($join) use ($village){
-            $join->on("disaster_events.id","=","disasters.id")
-                ->join("disaster_areas",function($daJoin) use ($village){
-                    $daJoin->on("disaster_areas.disaster_id","=","disasters.id")
-                        ->whereRaw("ST_Intersects(disaster_areas.area,".$village->geom.")");
-                });
-        });
+        $this->joinWithDisasterAreas();
+        $this->joinWithVillages();
+        $this->query->where("villages.id","=",$village_id);
         return $this;
     }
 
@@ -123,7 +115,49 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
 
     public function sql()
     {
-        return $this->query;
+        return $this->query->toSql();
     }
-    
+
+    private function joinWithDisasters(){
+        if (!$this->join_with_disasters){
+            $this->join_with_disasters = true;
+            $this->query->join("disasters","disaster_events.id","=","disasters.disaster_event_id");
+        }
+    }
+
+    private function joinWithDisasterAreas(){
+        if (!$this->join_with_disaster_areas){
+            $this->join_with_disaster_areas = true;
+            $this->joinWithDisasters();
+            $this->query->join("disaster_areas","disasters.id","=","disaster_areas.disaster_id");
+        }
+    }
+
+    private function joinWithVillages(){
+        if (!$this->join_with_villages){
+            $this->join_with_villages = true;
+            $this->joinWithDisasterAreas();
+            $this->query->crossJoin("villages");
+            $this->query->whereRaw("ST_Intersects(disaster_areas.region,villages.geom)");
+        }
+    }
+
+    /**
+     * @param array $array
+     * @return DisasterEventQueryBuilder
+     */
+    public function select($array)
+    {
+        $this->query->select($array);
+        return $this;
+    }
+
+    /**
+     * @return DisasterEventQueryBuilder
+     */
+    public function distinct()
+    {
+        $this->query->distinct();
+        return $this;
+    }
 }

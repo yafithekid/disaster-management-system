@@ -5,7 +5,17 @@ namespace App\Services;
 
 interface VillageQueryBuilder
 {
-    
+    /**
+     * @param array $array
+     * @return VillageQueryBuilder
+     */
+    public function select($array);
+
+    /**
+     * @return VillageQueryBuilder
+     */
+    public function distinct();
+
     /**
      * return result as SQL query
      * @return string

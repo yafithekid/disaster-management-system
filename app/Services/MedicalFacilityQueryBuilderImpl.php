@@ -77,4 +77,23 @@ class MedicalFacilityQueryBuilderImpl implements MedicalFacilityQueryBuilder
     {
         return $this->query->first();
     }
+
+    /**
+     * @param array $array
+     * @return MedicalFacilityQueryBuilder
+     */
+    public function select($array)
+    {
+        $this->query->select($array);
+        return $this;
+    }
+
+    /**
+     * @return MedicalFacilityQueryBuilder
+     */
+    public function distinct()
+    {
+        $this->query->distinct();
+        return $this;
+    }
 }

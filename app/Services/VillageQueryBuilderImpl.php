@@ -72,7 +72,7 @@ class VillageQueryBuilderImpl implements VillageQueryBuilder
     public function disasterType($type)
     {
         $this->joinWithDisasters();
-        $this->query->where("disaster_events.type","=",$type);
+        $this->query->where("disasters.type","=",$type);
         return $this;
     }
 
@@ -95,7 +95,7 @@ class VillageQueryBuilderImpl implements VillageQueryBuilder
     {
         $this->joinWithDisasterAreas();
         $this->query
-            ->whereRaw("(TIMESTAMP $start_date,TIMESTAMP $end_date) OVERLAPS (victim_locations.start, victim_locations.end)");
+            ->whereRaw("(TIMESTAMP '$start_date',TIMESTAMP '$end_date') OVERLAPS (disaster_areas.start, disaster_areas.end)");
         return $this;
     }
 
@@ -136,17 +136,34 @@ class VillageQueryBuilderImpl implements VillageQueryBuilder
         if (!$this->join_with_disasters){
             $this->join_with_disasters = true;
             $this->joinWithDisasterEvents();
-            $this->query->join("disasters","disaster_events.id","=","disasters.disaster_events.id");
+            $this->query->join("disasters","disaster_events.id","=","disasters.disaster_event_id");
         }
     }
 
     private function joinWithDisasterAreas()
     {
-        if (!$this->join_with_disaster_areas){
+        if (!$this->join_with_disaster_areas) {
             $this->join_with_disaster_areas = true;
             $this->joinWithDisasters();
-            $this->query->join("disaster_areas","disasters.id","=","disaster_areas.disaster_id");
+            $this->query->join("disaster_areas", "disasters.id", "=", "disaster_areas.disaster_id");
         }
     }
 
+    /**
+     * @return VillageQueryBuilder
+     */
+    public function select($array)
+    {
+        $this->query->select($array);
+        return $this;
+    }
+
+    /**
+     * @return VillageQueryBuilder
+     */
+    public function distinct()
+    {
+        $this->query->distinct();
+        return $this;
+    }
 }

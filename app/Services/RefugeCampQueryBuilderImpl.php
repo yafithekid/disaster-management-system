@@ -62,4 +62,23 @@ class RefugeCampQueryBuilderImpl implements RefugeCampQueryBuilder
     {
         return $this->query->first();
     }
+
+    /**
+     * @param array $array
+     * @return RefugeCampQueryBuilder
+     */
+    public function select($array)
+    {
+        $this->query->select($array);
+        return $this;
+    }
+
+    /**
+     * @return RefugeCampQueryBuilder
+     */
+    public function distinct()
+    {
+        $this->query->distinct();
+        return $this;
+    }
 }

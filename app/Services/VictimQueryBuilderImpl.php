@@ -26,6 +26,12 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
         $this->query = $database->table("victims");
     }
 
+    public function select($array)
+    {
+        $this->query->select($array);
+        return $this;
+    }
+
     public function get()
     {
         return $this->query->get();
@@ -38,10 +44,7 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
         $this->joinWithDisasters();
         $this->joinWithDisasterAreas();
         $this->query
-            ->where("disaster_events.id","=",$id)
-            ->whereRaw("ST_Within(victim_locations.point,disaster_areas.region)")
-            ->whereRaw("(victim_locations.start,victim_locations.end) OVERLAPS (disaster_areas.start,disaster_areas.end)")
-            ->select("victims.*")->distinct();
+            ->where("disaster_events.id","=",$id);
         return $this;
     }
 
@@ -61,7 +64,7 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
     {
         $this->joinWithDisasterAreas();
         $this->query
-            ->whereRaw("(TIMESTAMP $start_date,TIMESTAMP $end_date) OVERLAPS (victim_locations.start, victim_locations.end)");
+            ->whereRaw("(TIMESTAMP '$start_date',TIMESTAMP '$end_date') OVERLAPS (victim_locations.start, victim_locations.end)");
         return $this;
     }
 
@@ -99,33 +102,36 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
 
     public function ageGroup($group)
     {
+        $this->joinWithDisasterAreas();
         switch (strtolower($group)) {
             case "baby":
-                $this->query->where("date_of_birth", ">", "current_date - interval '5 years'");
+                $this->query
+                    ->whereRaw("date_of_birth >  disaster_events.date_start - interval '1 years'")
+                    ->whereRaw("date_of_birth <= disaster_events.date_start - interval '0 years'");
                 break;
             case "toddler":
                 $this->query
-                    ->where("date_of_birth", ">=", "current_date - interval '5 years'")
-                    ->where("date_of_birth", "<=", "current_date - interval '1 years'");
+                    ->whereRaw("date_of_birth >= disaster_events.date_start - interval '5 years'")
+                    ->whereRaw("date_of_birth <= disaster_events.date_start - interval '1 years'");
                 break;
             case "child":
                 $this->query
-                    ->where("date_of_birth", ">=", "current_date - interval '12 years'")
-                    ->where("date_of_birth", "<=", "current_date - interval '5 years'");
+                    ->whereRaw("date_of_birth >= disaster_events.date_start - interval '12 years'")
+                    ->whereRaw("date_of_birth <= disaster_events.date_start - interval '5 years'");
                 break;
             case "teenager":
                 $this->query
-                    ->where("date_of_birth", ">=", "current_date - interval '17 years'")
-                    ->where("date_of_birth", "<=", "current_date - interval '13 years'");
+                    ->whereRaw("date_of_birth >= disaster_events.date_start - interval '17 years'")
+                    ->whereRaw("date_of_birth <= disaster_events.date_start - interval '13 years'");
                 break;
             case "adult":
                 $this->query
-                    ->where("date_of_birth", ">=", "current_date - interval '59 years'")
-                    ->where("date_of_birth", "<=", "current_date - interval '18 years'");
+                    ->whereRaw("date_of_birth >= disaster_events.date_start - interval '59 years'")
+                    ->whereRaw("date_of_birth <= disaster_events.date_start - interval '18 years'");
                 break;
             case "elderly":
                 $this->query
-                    ->where("date_of_birth", "<=", "current_date - interval '60 years'");
+                    ->whereRaw("date_of_birth <= disaster_events.date_start - interval '60 years'");
                 break;
         }
         return $this;
@@ -221,6 +227,26 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
         return $this;
     }
 
+    /**
+     * join with victim locations
+     * @return VictimQueryBuilder
+     */
+    public function withVictimLocations()
+    {
+        $this->joinWithVictimLocations();
+        return $this;
+    }
+
+    /**
+     * @param int $id
+     * @return VictimQueryBuilder
+     */
+    public function id($id)
+    {
+        $this->query->where("victims.id","=",$id);
+        return $this;
+    }
+
     private function joinWithVictimLocations(){
         if (!$this->join_with_victim_locations){
             $this->join_with_victim_locations = true;
@@ -254,8 +280,11 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
     {
         if (!$this->join_with_disaster_areas){
             $this->joinWithDisasters();
+            $this->joinWithVictimLocations();
             $this->join_with_disaster_areas = true;
             $this->query->join("disaster_areas","disaster_areas.disaster_id","=","disasters.id");
+            $this->query->whereRaw("ST_Within(victim_locations.point,disaster_areas.region)");
+            $this->query->whereRaw("(victim_locations.start,victim_locations.end) OVERLAPS (disaster_areas.start,disaster_areas.end)");
         }
     }
 
@@ -272,7 +301,7 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
             $this->joinWithVictimLocations();
             $this->query
                 ->crossJoin("medical_facilities")
-                ->whereRaw("ST_Equals(medical_facilities.point,victim_locations.point)");
+                ->whereRaw("ST_Equals(medical_facilities.location,victim_locations.point)");
         }
     }
 
@@ -282,10 +311,33 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
             $this->joinWithVictimLocations();
             $this->query
                 ->crossJoin("refuge_camps")
-                ->whereRaw("ST_Equals(refuge_camps.point,victim_locations.point)");
+                ->whereRaw("ST_Equals(refuge_camps.location,victim_locations.point)");
         }
     }
 
 
+    /**
+     * @return VictimQueryBuilder
+     */
+    public function isMale()
+    {
+        return $this->gender('m');
+    }
 
+    /**
+     * @return VictimQueryBuilder
+     */
+    public function isFemale()
+    {
+        return $this->gender('f');
+    }
+
+    /**
+     * @return DisasterEventQueryBuilder
+     */
+    public function distinct()
+    {
+        $this->query->distinct();
+        return $this;
+    }
 }

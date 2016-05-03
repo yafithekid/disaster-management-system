@@ -6,6 +6,17 @@ namespace App\Services;
 interface RefugeCampQueryBuilder
 {
     /**
+     * @param array $array
+     * @return RefugeCampQueryBuilder
+     */
+    public function select($array);
+
+    /**
+     * @return RefugeCampQueryBuilder
+     */
+    public function distinct();
+
+    /**
      * return result as SQL query
      * @return string
      */

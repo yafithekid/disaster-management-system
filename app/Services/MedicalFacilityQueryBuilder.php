@@ -6,6 +6,17 @@ namespace App\Services;
 interface MedicalFacilityQueryBuilder
 {
     /**
+     * @param array $array
+     * @return MedicalFacilityQueryBuilder
+     */
+    public function select($array);
+
+    /**
+     * @return MedicalFacilityQueryBuilder
+     */
+    public function distinct();
+    
+    /**
      * return result as SQL query
      * @return string
      */

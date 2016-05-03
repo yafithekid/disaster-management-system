@@ -6,6 +6,22 @@ namespace App\Services;
 interface VictimQueryBuilder
 {
     /**
+     * @param array $array
+     * @return DisasterEventQueryBuilder
+     */
+    public function select($array);
+
+    /**
+     * @return DisasterEventQueryBuilder
+     */
+    public function distinct();
+
+    /**
+     * @return int
+     */
+    public function count();
+
+    /**
      * return result as SQL query
      * @return string
      */
@@ -22,6 +38,18 @@ interface VictimQueryBuilder
      * @return object
      */
     public function first();
+
+    /**
+     * @param int $id
+     * @return VictimQueryBuilder
+     */
+    public function id($id);
+
+    /**
+     * join with victim locations
+     * @return VictimQueryBuilder
+     */
+    public function withVictimLocations();
 
     /**
      * @param $id
@@ -92,10 +120,14 @@ interface VictimQueryBuilder
     public function status($status);
 
     /**
-     * @param $gender 'm' | 'f'
      * @return VictimQueryBuilder
      */
-    public function gender($gender);
+    public function isMale();
+
+    /**
+     * @return VictimQueryBuilder
+     */
+    public function isFemale();
 
     /**
      * @param $group

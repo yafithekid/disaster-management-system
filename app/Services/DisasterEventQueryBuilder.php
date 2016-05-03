@@ -4,6 +4,17 @@ namespace App\Services;
 interface DisasterEventQueryBuilder
 {
     /**
+     * @param array $array
+     * @return DisasterEventQueryBuilder
+     */
+    public function select($array);
+
+    /**
+     * @return DisasterEventQueryBuilder
+     */
+    public function distinct();
+
+    /**
      * return result as SQL query
      * @return string
      */
