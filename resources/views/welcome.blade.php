@@ -2,44 +2,23 @@
 <html>
     <head>
         <title>Laravel</title>
-
-        <link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet" type="text/css">
-
-        <style>
-            html, body {
-                height: 100%;
-            }
-
-            body {
-                margin: 0;
-                padding: 0;
-                width: 100%;
-                display: table;
-                font-weight: 100;
-                font-family: 'Lato';
-            }
-
-            .container {
-                text-align: center;
-                display: table-cell;
-                vertical-align: middle;
-            }
-
-            .content {
-                text-align: center;
-                display: inline-block;
-            }
-
-            .title {
-                font-size: 96px;
-            }
-        </style>
     </head>
     <body>
-        <div class="container">
-            <div class="content">
-                <div class="title">Laravel 5</div>
-            </div>
-        </div>
+        <div>Soal 1</div>
+        <div><a href="/dimas/disaster-events" target="_blank">/dimas/disaster-events</a></div>
+        <div>Soal 2</div>
+        <div><a href="/dimas/disaster-event-changes" target="_blank">/dimas/disaster-event-changes</a></div>
+        <div>Soal 3</div>
+        <div><a href="/dimas/victim-movements/1" target="_blank">/dimas/victim-movements/1</a></div>
+        <div>Soal 4</div>
+        <div><a href="/dimas/villages-affected" target="_blank">/dimas/villages-affected</a></div>
+        <div>Soal 5</div>
+        <div><a href="/dimas/victims" target="_blank">/dimas/victims"</a></div>
+        <div>Soal 6</div>
+        <div><a href="/dimas/refuge-camps" target="_blank">/dimas/refuge-camps"</a></div>
+        <div>Soal 7</div>
+        <div><a href="/dimas/medical-facilities" target="_blank">/dimas/medical-facilities"</a></div>
+        <div>Soal 8</div>
+        <div><a href="/dimas/number-of-victims" target="_blank">/dimas/number-of-victims"</a></div>
     </body>
 </html>

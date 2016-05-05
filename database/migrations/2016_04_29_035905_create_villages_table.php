@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class CreateVillagesTable extends Migration
@@ -21,7 +22,11 @@ class CreateVillagesTable extends Migration
             $table->string('district');
             $table->string('province');
         });
-        DB::statement("ALTER TABLE $this->tablename ADD COLUMN area geometry(Polygon)");
+        DB::statement("ALTER TABLE $this->tablename ADD COLUMN geom geometry(Polygon)");
+        Schema::table("victims",function(Blueprint $table){
+            $table->integer("village_id")->unsigned();
+            $table->foreign("village_id")->references("id")->on("villages")->onDelete("cascade")->onUpdate("cascade");
+        });
     }
 
     /**
@@ -31,6 +36,9 @@ class CreateVillagesTable extends Migration
      */
     public function down()
     {
+        Schema::table("victims",function(Blueprint $table){
+            $table->dropForeign("victims_village_id_foreign");
+        });
         Schema::drop($this->tablename);
     }
 }

@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Services\DisasterEventQueryBuilder;
+use App\Services\MedicalFacilityQueryBuilder;
+use App\Services\VictimQueryBuilder;
 use App\User;
+use Illuminate\Foundation\Application;
 use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
@@ -68,5 +72,18 @@ class AuthController extends Controller
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
         ]);
+    }
+
+    public function test(Application $app){
+        echo "nomor 7<br/>";
+        /** @var MedicalFacilityQueryBuilder $medicalFacQB */
+        $medicalFacQB = $app->make(MedicalFacilityQueryBuilder::class);
+        $medicalFacQB->villageId(1)->subdistrict("woi")->district("aaa");
+        echo $medicalFacQB->sql()."<br/>";
+        echo "nomor 8<br/>";
+        /** @var VictimQueryBuilder $victimQB */
+        $victimQB = $app->make(VictimQueryBuilder::class);
+        $victimQB->status('affected')->ageGroup('baby')->gender('f')->refugeCamp('aaa')->medicalFacilityType('woi');
+        echo $victimQB->sql()."<br/>";
     }
 }

@@ -15,8 +15,8 @@ class CreateDisasterEventsTable extends Migration
     {
         Schema::create($this->tablename,function(Blueprint $table){
             $table->increments('id');
-            $table->dateTime('date_start');
-            $table->dateTime('date_end');
+            $table->date('date_start');
+            $table->date('date_end');
             $table->string('cause');
         });
     }

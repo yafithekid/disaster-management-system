@@ -16,10 +16,11 @@ class CreateDisastersTable extends Migration
     {
         Schema::create($this->tablename,function(Blueprint $table){
             $table->increments('id');
-            $table->integer('disaster_id')->unsigned();
+            $table->integer('disaster_event_id')->unsigned();
             $table->string('type');
 
-            $table->foreign('disaster_id')->references('id')->on('disaster_events');
+            $table->foreign('disaster_event_id')->references('id')->on('disaster_events')
+            ->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
@@ -31,7 +32,7 @@ class CreateDisastersTable extends Migration
     public function down()
     {
         Schema::table($this->tablename,function(Blueprint $table){
-            $table->dropForeign($this->tablename."_disaster_id_foreign");
+            $table->dropForeign($this->tablename."_disaster_event_id_foreign");
         });
         Schema::drop($this->tablename);
     }
