@@ -49,7 +49,7 @@ interface VictimQueryBuilder
      * join with victim locations
      * @return VictimQueryBuilder
      */
-    public function withVictimLocations();
+    public function joinWithVictimLocations();
 
     /**
      * @param $id
@@ -57,6 +57,13 @@ interface VictimQueryBuilder
      */
     public function disasterEvent($id);
 
+
+    /**
+     * @param string $column
+     * @param string $ord
+     * @return VictimQueryBuilder
+     */
+    public function orderBy($column,$ord = 'asc');
     /**
      * @param $type
      * @return VictimQueryBuilder
