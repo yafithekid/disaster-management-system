@@ -228,16 +228,6 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
     }
 
     /**
-     * join with victim locations
-     * @return VictimQueryBuilder
-     */
-    public function withVictimLocations()
-    {
-        $this->joinWithVictimLocations();
-        return $this;
-    }
-
-    /**
      * @param int $id
      * @return VictimQueryBuilder
      */
@@ -247,11 +237,12 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
         return $this;
     }
 
-    private function joinWithVictimLocations(){
+    public function joinWithVictimLocations(){
         if (!$this->join_with_victim_locations){
             $this->join_with_victim_locations = true;
             $this->query->join("victim_locations","victims.id","=","victim_locations.victim_id");
         }
+        return $this;
     }
 
     private function joinWithVictimStatus(){
@@ -338,6 +329,17 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
     public function distinct()
     {
         $this->query->distinct();
+        return $this;
+    }
+
+    /**
+     * @param string $column
+     * @param string $ord
+     * @return VictimQueryBuilder
+     */
+    public function orderBy($column, $ord = 'asc')
+    {
+        $this->query->orderBy($column,$ord);
         return $this;
     }
 }

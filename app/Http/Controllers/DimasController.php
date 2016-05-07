@@ -7,12 +7,43 @@ use App\Services\MedicalFacilityQueryBuilder;
 use App\Services\RefugeCampQueryBuilder;
 use App\Services\VictimQueryBuilder;
 use App\Services\VillageQueryBuilder;
+use GeoJson\GeoJson;
+use Illuminate\Database\Connection;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 
 class DimasController extends Controller
 {
+    private $db;
+    const DEBUG = true;
+
+    public function __construct(Connection $database)
+    {
+        $this->db = $database;
+        if (self::DEBUG)
+        $database->listen(function($the_query)
+        {
+            $query = $the_query->sql;
+            $bindings = $the_query->bindings;
+            // Format binding data for sql insertion
+            foreach ($bindings as $i => $binding) {
+                if ($binding instanceof \DateTime) {
+                    $bindings[$i] = $binding->format('\'Y-m-d H:i:s\'');
+                } else if (is_string($binding)) {
+                    $bindings[$i] = "'$binding'";
+                }
+            }
+
+            // Insert bindings into query
+            $query = str_replace(array('%', '?'), array('%%', '%s'), $query);
+            $query = vsprintf($query, $bindings);
+
+            // Debug SQL queries
+            echo "\n".$query."\n";
+        });
+    }
+
     /**
      * Soal nomor 1
      * @param Request $request
@@ -37,8 +68,10 @@ class DimasController extends Controller
         $query->subdistrict("a subdistrict");
         $query->district("a district");
         $query->province("a province");
-        echo $query->sql()."\n";
-        return $query->get();
+        $query->select(["disaster_events.*"]);
+        $data = $query->get();
+        dd($data);
+        return response()->json($data);
     }
 
     /**
@@ -49,9 +82,17 @@ class DimasController extends Controller
      */
     public function getDisasterEventChanges(Request $request,DisasterEventQueryBuilder $query)
     {
-        //TODO impl
-        echo $query->type(null)->sql()."\n";
-        return $query->get();
+        $query->joinWithDisasterAreas();
+        $query->select([
+            "disaster_events.*","disaster_areas.*",$this->db->raw("ST_AsGeoJSON(disaster_areas.region) AS region")
+        ]);
+
+        $data = $query->get();
+        foreach ($data as $datum){
+            $datum->region = GeoJson::jsonUnserialize(json_decode($datum->region));
+        }
+        dd($data);
+        return response()->json($data);
     }
 
     /**
@@ -63,10 +104,16 @@ class DimasController extends Controller
      */
     public function getVictimMovements($id,Request $request,VictimQueryBuilder $query)
     {
-        $query->withVictimLocations();
+        $query->joinWithVictimLocations();
         $query->id($id);
-        echo $query->sql()."\n";
-        return $query->get();
+        $query->orderBy('victim_locations.start','asc');
+        $query->select(["victims.*",'victim_locations.start','victim_locations.end',$this->db->raw("ST_AsGeoJSON(victim_locations.point) AS point")]);
+        $data = $query->get();
+        foreach($data as $datum){
+            $datum->point = GeoJson::jsonUnserialize(json_decode($datum->point));
+        }
+        dd($data);
+        return response()->json($data);
     }
 
     /**
@@ -80,8 +127,9 @@ class DimasController extends Controller
         $query->disasterEvent(1);
         $query->disasterType('flood');
         $query->month(2014,1);
-        echo $query->sql()."\n";
-        return $query->get();
+        $data = $query->get();
+        dd($data);
+        return response()->json($data);
     }
 
     /**
@@ -96,8 +144,9 @@ class DimasController extends Controller
         $query->disasterType('flood');
         $query->date('2014-10-31');
         $query->subdistrict('a subdistrict');
-        echo $query->sql()."\n";
-        return $query->get();
+        $data = $query->get();
+        dd($data);
+        return response()->json($data);
     }
 
     /**
@@ -113,8 +162,13 @@ class DimasController extends Controller
         echo $request->input("subdistrict")."\n";
         echo $request->input("village")."\n";
         $query->villageId($request->input("village"));
-        echo $query->sql()."\n";
-        return $query->get();
+        $query->select(["refuge_camps.*",$this->db->raw("ST_AsGeoJSON(location) AS location")]);
+        $data = $query->get();
+        foreach ($data as $datum) {
+            $datum->location = GeoJson::jsonUnserialize(json_decode($datum->location));
+        }
+        dd($data);
+        return response()->json($data);
     }
 
     /**
@@ -125,11 +179,14 @@ class DimasController extends Controller
      */
     public function getMedicalFacilities(Request $request,MedicalFacilityQueryBuilder $query)
     {
-        $query->villageId(1);
-        $query->province('a province');
-        $query->select(["medical_facilities.*"])->distinct();
-        echo $query->sql()."\n";
-        return $query->get();
+        $query->villageId(10346);
+        $query->select(["medical_facilities.*",$this->db->raw("ST_AsGeoJSON(location) AS location")])->distinct();
+        $data = $query->get();
+        foreach ($data as $datum){
+            $datum->location = GeoJson::jsonUnserialize(json_decode($datum->location));
+        }
+        dd($data);
+        return response()->json($data);
     }
 
     /**
@@ -146,7 +203,8 @@ class DimasController extends Controller
 //        $query->refugeCamp('a refuge camp');
 //        $query->medicalFacilityType('a type');
         $query->disasterEvent(1)->select(["victims.*"])->distinct();
-        echo $query->sql()."\n";
-        return $query->count();
+        $data = $query->get();
+        dd($data);
+        return response()->json($query->count());
     }
 }

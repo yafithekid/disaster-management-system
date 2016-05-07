@@ -118,19 +118,20 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
         return $this->query->toSql();
     }
 
-    private function joinWithDisasters(){
+    public function joinWithDisasters(){
         if (!$this->join_with_disasters){
             $this->join_with_disasters = true;
             $this->query->join("disasters","disaster_events.id","=","disasters.disaster_event_id");
         }
     }
 
-    private function joinWithDisasterAreas(){
+    public function joinWithDisasterAreas(){
         if (!$this->join_with_disaster_areas){
             $this->join_with_disaster_areas = true;
             $this->joinWithDisasters();
             $this->query->join("disaster_areas","disasters.id","=","disaster_areas.disaster_id");
         }
+        return $this;
     }
 
     private function joinWithVillages(){
@@ -160,4 +161,14 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
         $this->query->distinct();
         return $this;
     }
+    
+    public function disasterType($type = null)
+    {
+        $this->joinWithDisasters();
+        if ($type !== null){
+            $this->query->where("disasters.type","=",$type);
+        }
+        return $this;
+    }
+
 }

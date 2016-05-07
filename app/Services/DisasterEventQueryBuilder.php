@@ -4,6 +4,24 @@ namespace App\Services;
 interface DisasterEventQueryBuilder
 {
     /**
+     * join dengan disaster areas
+     * @return DisasterEventQueryBuilder
+     */
+    public function joinWithDisasterAreas();
+
+    /**
+     * join dengan disasters
+     * @return DisasterEventQueryBuilder
+     */
+    public function joinWithDisasters();
+
+    /**
+     * @param string|null $type
+     * @return DisasterEventQueryBuilder
+     */
+    public function disasterType($type = null);
+
+    /**
      * @param array $array
      * @return DisasterEventQueryBuilder
      */
