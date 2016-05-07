@@ -12,9 +12,13 @@
 */
 
 
-Route::get('/', ['uses' => 'LeafletTest@getFranceRegion', function () {
+Route::get('/index', ['uses' => 'IndexController@populateOpts', function () {
     return view('index');
 }]);
+
+Route::get('/', function () {
+	return view('welcome');
+});
 
 Route::get('/test',['uses'=>'Auth\AuthController@test']);
 

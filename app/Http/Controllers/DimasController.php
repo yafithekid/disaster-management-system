@@ -108,7 +108,11 @@ class DimasController extends Controller
      */
     public function getRefugeCamps(Request $request,RefugeCampQueryBuilder $query)
     {
-        $query->villageId(1);
+        echo $request->input("province")."\n";
+        echo $request->input("district")."\n";
+        echo $request->input("subdistrict")."\n";
+        echo $request->input("village")."\n";
+        $query->villageId($request->input("village"));
         echo $query->sql()."\n";
         return $query->get();
     }
