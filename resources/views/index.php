@@ -287,7 +287,7 @@
                                 <div class="input-group">
                                     <div class="row">
                                         <div class="col-md-3">
-                                            <select class="form-control" id="province" name="province">
+                                            <select class="form-control" id="province" name="province" onchange="populateDistrict(this.value)">
                                                 <option value="">Province unset..</option>
                                                 <?php
                                                     foreach($provinces as $opt) {

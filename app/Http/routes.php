@@ -15,6 +15,7 @@
 Route::get('/index', ['uses' => 'IndexController@populateOpts', function () {
     return view('index');
 }]);
+Route::get('/index/populate-districts', ['uses' => 'IndexController@populateDistricts']);
 
 Route::get('/', function () {
 	return view('welcome');

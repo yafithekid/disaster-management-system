@@ -24,13 +24,79 @@ var geojsonObj = {
 		"coordinates" : ""
 	}
 };
-console.log(geojsons);
-L.geoJson(geojsons).addTo(mymap);
+// console.log(geojsons);
+// L.geoJson(geojsons).addTo(mymap);
 
 
 // OPTIONS POPULATION
 
-var provinceDD = document.getElementById('province');
-provinceDD.onchange = function(province) {
-	//TODO: call controller to query district.
-};
+function populateDistrict(province) {
+		// var districtSelect = '';
+		var districtSelect2 = $('select[name="district"]');
+		if (!districtSelect2.attr('disabled')) {
+			districtSelect2.empty();
+			var optUnset = document.createElement('option');
+			optUnset.text = "Unset";
+			optUnset.value = null;
+			districtSelect2.append(optUnset);
+		}
+
+		//TODO: call controller to query district.
+		$.get('http://localhost:8000/index/populate-districts', {
+			province: province
+		}).done(function(districtOpts) {
+			districtSelect2.prop('disabled', false);
+			console.log(districtOpts);
+			var opts = districtOpts["districtOpts"];
+			// districtSelect = '<select name="district" id="district" onchange="populateSubdistrict(this.value)">';
+			for (var i = 0; i < opts.length; i++) {
+				var optval = document.createElement('option');
+				optval.text = opts[i];
+				optval.value = opts[i];
+				districtSelect2.append(optval);
+				// var temp = districtSelect + "<option value=\"" + opts[i]
+				// 			+ "\">" + opts[i] 
+				// 			+ "</option>";
+				// districtSelect = temp;
+			}
+
+			// console.log(districtSelect);
+			// document.getElementById('district').innerHTML = districtSelect + "</select>";
+			// districtOpts.forEach(function(entry) {
+			// 	var currDistrict = entry;
+			// 	districtSelect.concat("<option value=\"");
+			// 	districtSelect.concat(currDistrict);
+			// 	districtSelect.concat("\">");
+			// 	districtSelect.concat(currDistrict);
+			// 	districtSelect.concat("</option>");
+			// });
+		}).fail(function(data) {
+			alert("error");
+		});
+		
+}
+
+// document.getElementById('province').addEventListener("change", function(province){
+// 	console.log(province);
+// });
+// provinceDD.onchange = function(province) {
+// 	console.log(province);
+// 	var districtSelect = '';
+// 	//TODO: call controller to query district.
+// 	$.get('http://localhost:8000/index/populate-districts', {
+// 		province: province
+// 	}).done(function(data) {
+// 		districtSelect = '<select name="district" id="district">';
+// 		districtOpts.forEach(function(entry) {
+// 			var currDistrict = entry;
+// 			districtSelect.concat("<option value=\"");
+// 			districtSelect.concat(currDistrict);
+// 			districtSelect.concat("\">");
+// 			districtSelect.concat(currDistrict);
+// 			districtSelect.concat("</option>");
+// 		});
+// 	}).fail(function(data) {
+// 		alert("error");
+// 	});
+// 	document.getElementById('district').innerHTML = districtSelect;
+// };

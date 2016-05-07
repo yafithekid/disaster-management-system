@@ -33,4 +33,13 @@ class IndexController extends Controller
     		'types' => $resDisasterType
     		]);
     }
+
+    public function populateDistricts(Request $request) {
+    	$provinceName = $request->input("province");
+    	$resDistrict = DB::table('villages')->distinct()->where('province', $provinceName)->orderBy('district', 'asc')->pluck('district');
+    	JavaScript::put([
+    			'districtOpts' => $resDistrict
+    		]);
+    	return ['districtOpts' => $resDistrict];
+    }
 }
