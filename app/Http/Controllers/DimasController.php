@@ -201,7 +201,7 @@ class DimasController extends Controller
      */
     public function getMedicalFacilities(Request $request,MedicalFacilityQueryBuilder $query)
     {
-        $query->villageId(10346);
+        $query->villageId($request->input('villageId'));
         $query->select(["medical_facilities.*",$this->db->raw("ST_AsGeoJSON(location) AS location")])->distinct();
         $data = $query->get();
         foreach ($data as $datum){
