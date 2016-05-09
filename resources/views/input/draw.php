@@ -58,8 +58,9 @@ echo session('response');
         <div id="map" style="height:500px;">
         </div>
     </div>
-    <div class="row">
-        <div id="json"></div>
+    <div class="row" style="padding:20px;
+    ">
+        <div id="json">konten</div>
     </div>
 <!-- /.container -->
 
@@ -104,18 +105,22 @@ echo session('response');
         var type;
         if (e.layerType=='polyline'){
             type = "LineString";
+        } else if (e.layerType == 'marker'){
+            type = "Point";
         } else {
             type = "Polygon";
         }
+        // alert(type);
         drawnItems.addLayer(e.layer);
         var a = "ST_GeomFromGeoJSON({\"type\":\""+type+"\",\"coordinates\":[";
 
         var latlngs = e.layer.getLatLngs();
-        latlngs.forEach(function(latlng){
+        latlngs.forEach(function(latlng,i){
+            if (i > 0) a = a + ",";
             a = a + "["+latlng.lat+","+latlng.lng+"]";
         });
         a += "]})";
-        alert(a);
+        $("#json").html(a);
     });
 </script>
 
