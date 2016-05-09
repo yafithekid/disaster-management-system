@@ -1,5 +1,9 @@
 <?php
-    // print_r($villages);
+    // if(!isset(session)) {
+    //     session = $this->session();    
+    // }
+    echo session('response');
+
 ?>
 
 <!DOCTYPE html>
@@ -46,7 +50,7 @@
 
 </head>
 
-<body>
+<body onload="loadMap()">
 
     <!-- Navigation -->
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -123,8 +127,9 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         <h4 class="modal-title" id="modalDisasterEventsLabel">Disaster Events Query</h4>
                     </div>
-                    <div class="modal-body">
-                        <form>
+                    <form method="get" action="/dimas/disaster-events">
+                        <div class="modal-body">
+                        
                             <fieldset class="form-group">
                                 <label for="timeInput">Certain Time</label>
                                 <div class="input-group">
@@ -159,7 +164,7 @@
                                 <div class="input-group">
                                     <div class="row">
                                         <div class="col-md-3">
-                                            <select class="form-control" id="province" name="province">
+                                            <select class="form-control" id="province" name="province" onchange="populateDistrict(this.value)">
                                                 <option value="">Province unset..</option>
                                                 <?php
                                                     foreach($provinces as $opt) {
@@ -169,33 +174,18 @@
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <select class="form-control" id="district" name="district">
-                                                <option value="">District unset..</option>
-                                                <?php
-                                                    foreach($districts as $opt) {
-                                                        echo "<option value".$opt.">".$opt."</option>";
-                                                    }
-                                                ?>
+                                            <select class="form-control" id="district" name="district" disabled="disabled" onchange="populateSubdistrict(this.value)">
+                                                <option value="">Unset</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <select class="form-control" id="subdistrict" name="subdistrict">
-                                                <option value="">Subdistrict unset..</option>
-                                                <?php
-                                                    foreach($subdistricts as $opt) {
-                                                        echo "<option value".$opt.">".$opt."</option>";
-                                                    }
-                                                ?>
+                                            <select class="form-control" id="subdistrict" name="subdistrict" disabled="disabled" onchange="populateVillage(this.value)">
+                                                <option value="">Unset..</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <select class="form-control" id="village" name="village">
+                                            <select class="form-control" id="village" name="village" disabled="disabled">
                                                 <option value="">Village unset..</option>
-                                                <?php
-                                                    foreach($villages as $id => $name) {
-                                                        echo "<option value".$name.">".$id."</option>";
-                                                    }
-                                                ?>
                                             </select>
                                         </div>
                                     </div>
@@ -216,12 +206,13 @@
                                 </div>
 
                             </fieldset>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Execute!</button>
-                    </div>
+                        
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Execute!</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -238,7 +229,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Execute!</button>
+                        <button type="submit" class="btn btn-primary">Execute!</button>
                     </div>
                 </div>
             </div>
@@ -256,7 +247,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Execute!</button>
+                        <button type="submit" class="btn btn-primary">Execute!</button>
                     </div>
                 </div>
             </div>
@@ -271,17 +262,8 @@
                     </div>
                     
                     <form method="get" action='/dimas/refuge-camps'>
-                    <div class="modal-body">
-                    <?php 
-                        // echo Form::open(array('action' => 'DimasController@getRefugeCamps', 'method' => 'get'));
-                        // echo Form::select('province', $provinces, '');
-                        // echo Form::select('district', $districts, '');
-                        // echo Form::select('subdistrict', $subdistricts, '');
-                        // echo Form::select('village', array(), '');
-                        // echo Form::submit('Execute!');
-                        // echo Form::close();
-                    ?>
-                        <!-- <form method="get" action='DimasController@getRefugeCamps'> -->
+                        <div class="modal-body">
+                        
                             <fieldset class="form-group">
                                 <label for="locationInput">Location</label>
                                 <div class="input-group">
@@ -297,48 +279,28 @@
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <select class="form-control" id="district" name="district" disabled="disabled">
-                                                <option value="">District unset..</option>
-                                                <?php
-                                                    // foreach($districts as $opt) {
-                                                    //     echo "<option value".$opt.">".$opt."</option>";
-                                                    // }
-                                                ?>
+                                            <select class="form-control" id="district" name="district" disabled="disabled" onchange="populateSubdistrict(this.value)">
+                                                <option value="">Unset</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <select class="form-control" id="subdistrict" name="subdistrict" disabled="disabled">
-                                                <option value="">Subdistrict unset..</option>
-                                                <?php
-                                                    // foreach($subdistricts as $opt) {
-                                                    //     echo "<option value".$opt.">".$opt."</option>";
-                                                    // }
-                                                ?>
+                                            <select class="form-control" id="subdistrict" name="subdistrict" disabled="disabled" onchange="populateVillage(this.value)">
+                                                <option value="">Unset..</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3">
                                             <select class="form-control" id="village" name="village" disabled="disabled">
                                                 <option value="">Village unset..</option>
-                                                <?php
-                                                    // foreach($villages as $id => $name) {
-                                                    //     echo "<option value=".$id.">".$name."</option>";
-                                                    // }
-                                                ?>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
                             </fieldset>
-                        <!-- </form> -->
-                        <?php
-                            // echo Form::submit('Execute!');
-                            // Form::close();
-                        ?>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Execute!</button>
-                    </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Execute!</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -351,14 +313,15 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         <h4 class="modal-title" id="modalMedicalFacilitiesLabel">Medical Facilities Query</h4>
                     </div>
-                    <div class="modal-body">
-                        <form>
+                    <form method="get" action='/dimas/medical-facilities'>
+                        <div class="modal-body">
+                        
                             <fieldset class="form-group">
                                 <label for="locationInput">Location</label>
                                 <div class="input-group">
                                     <div class="row">
                                         <div class="col-md-3">
-                                            <select class="form-control" id="province" name="province">
+                                            <select class="form-control" id="province" name="province" onchange="populateDistrict(this.value)">
                                                 <option value="">Province unset..</option>
                                                 <?php
                                                     foreach($provinces as $opt) {
@@ -368,45 +331,31 @@
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <select class="form-control" id="district" name="district">
-                                                <option value="">District unset..</option>
-                                                <?php
-                                                    foreach($districts as $opt) {
-                                                        echo "<option value".$opt.">".$opt."</option>";
-                                                    }
-                                                ?>
+                                            <select class="form-control" id="district" name="district" disabled="disabled" onchange="populateSubdistrict(this.value)">
+                                                <option value="">Unset</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <select class="form-control" id="subdistrict" name="subdistrict">
-                                                <option value="">Subdistrict unset..</option>
-                                                <?php
-                                                    foreach($subdistricts as $opt) {
-                                                        echo "<option value".$opt.">".$opt."</option>";
-                                                    }
-                                                ?>
+                                            <select class="form-control" id="subdistrict" name="subdistrict" disabled="disabled" onchange="populateVillage(this.value)">
+                                                <option value="">Unset..</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <select class="form-control" id="village" name="village">
+                                            <select class="form-control" id="village" name="village" disabled="disabled">
                                                 <option value="">Village unset..</option>
-                                                <?php
-                                                    foreach($villages as $id => $name) {
-                                                        echo "<option value".$name.">".$id."</option>";
-                                                    }
-                                                ?>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
 
                             </fieldset>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Execute!</button>
-                    </div>
+                        
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Execute!</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -429,6 +378,7 @@
         <div class="row">
             <!-- TODO: Use table; with angularJS maybe? -->
         </div>
+
     </div>
     <!-- /.container -->
 
@@ -454,6 +404,16 @@
             $('input[name="disasterperiods"]').daterangepicker();
         });
     </script>
+    <?php
+        if(session('response') !== null) {
+            // $json = json_decode(session('response')->content());
+            // $geojsons = \GeoJson\GeoJson::jsonUnserialize(session('response')->content());
+            echo "<script>
+                var response = ". session('response')->content() . ";"
+                ."addMarkerToMap(response);
+            </script>";
+        }
+    ?>
 
 </body>
 

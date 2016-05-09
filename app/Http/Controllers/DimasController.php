@@ -10,13 +10,14 @@ use App\Services\VillageQueryBuilder;
 use GeoJson\GeoJson;
 use Illuminate\Database\Connection;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 use App\Http\Requests;
 
 class DimasController extends Controller
 {
     private $db;
-    const DEBUG = true;
+    const DEBUG = false;
 
     public function __construct(Connection $database)
     {
@@ -161,14 +162,35 @@ class DimasController extends Controller
         echo $request->input("district")."\n";
         echo $request->input("subdistrict")."\n";
         echo $request->input("village")."\n";
+        echo $request;
         $query->villageId($request->input("village"));
-        $query->select(["refuge_camps.*",$this->db->raw("ST_AsGeoJSON(location) AS location")]);
+        $query->select(["refuge_camps.*",$this->db->raw("ST_AsGeoJSON(location, 4326) AS location")]);
         $data = $query->get();
+        $features = array();
         foreach ($data as $datum) {
             $datum->location = GeoJson::jsonUnserialize(json_decode($datum->location));
+            $features[] = array(
+                    'type' => 'Feature',
+                    'geometry' => $datum->location,
+                    'properties' => array('name' => $datum->name, 'capacity' => $datum->capacity, 'type' => $datum->type),
+                    );
         }
-        dd($data);
-        return response()->json($data);
+        // dd($data);
+        // $response = response()->json($data);
+
+        //constructing geojson object
+        // $original_data = json_decode($response, true);
+        // foreach($response->content() as $key => $value) { 
+        //     $features[] = array(
+        //             'type' => 'Feature',
+        //             'geometry' => $value['location'],
+        //             'properties' => array('name' => $value['name'], 'id' => $value['id'], 'capacity' => $value['capacity'], 'type' => $value['type']),
+        //             );
+        //     };   
+
+        $allfeatures = array('type' => 'FeatureCollection', 'features' => $features);
+        $response = response()->json($allfeatures);
+        return redirect()->route('index')->with('response', $response);
     }
 
     /**
@@ -206,5 +228,10 @@ class DimasController extends Controller
         $data = $query->get();
         dd($data);
         return response()->json($query->count());
+    }
+
+    public function testMethod(Request $request) {
+        echo ("test hahaha");
+        return redirect()->route('welcome');
     }
 }
