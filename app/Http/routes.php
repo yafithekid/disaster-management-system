@@ -11,6 +11,7 @@
 |
 */
 
+Route::get('/draw',['uses'=>'InputController@getDraw']);
 
 Route::get('/index', ['as' => 'index', 'uses' => 'IndexController@populateOpts', function () {
     return view('index');
