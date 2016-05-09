@@ -82,12 +82,13 @@ echo session('response');
 <div class="container">
 
     <div class="row">
-        @yield('form')
+        <div id="mapid">
+    </div>
     </div>
 </div>
 <div class="row">
-    <div id="mapid">
-    </div>
+    @yield('form')
+    
 </div>
 <!-- /.container -->
 
