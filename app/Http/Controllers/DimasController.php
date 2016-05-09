@@ -207,7 +207,6 @@ class DimasController extends Controller
         foreach ($data as $datum){
             $datum->location = GeoJson::jsonUnserialize(json_decode($datum->location));
         }
-        dd($data);
         return response()->json($data);
     }
 
