@@ -3,6 +3,7 @@
 namespace App\Services;
 interface DisasterEventQueryBuilder
 {
+    public function joinWithVillages();
     /**
      * join dengan disaster areas
      * @return DisasterEventQueryBuilder

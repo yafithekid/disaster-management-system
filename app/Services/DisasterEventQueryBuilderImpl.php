@@ -134,7 +134,7 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
         return $this;
     }
 
-    private function joinWithVillages(){
+    public function joinWithVillages(){
         if (!$this->join_with_villages){
             $this->join_with_villages = true;
             $this->joinWithDisasterAreas();
