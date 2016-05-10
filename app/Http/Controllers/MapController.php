@@ -19,4 +19,8 @@ class MapController extends Controller
     public function getMedicalFacilities(){
         return view('map.medical_facilities');
     }
+
+    public function getVictimMovements(){
+    	return view('map.victim_movements');
+    }
 }

@@ -16,6 +16,7 @@ Route::get('/draw',['uses'=>'InputController@getDraw']);
 Route::get('/map/disaster_event',['uses'=>'MapController@getDisasterEvent']);
 Route::get('/map/disaster_changes/{id}',['uses'=>'MapController@getDisasterChanges']);
 Route::get('/map/med_fac',['uses'=>'MapController@getMedicalFacilities']);
+Route::get('/map/victim_mov',['uses'=>'MapController@getVictimMovements']);
 
 Route::get('/index', ['as' => 'index', 'uses' => 'IndexController@populateOpts', function () {
     return view('index');
