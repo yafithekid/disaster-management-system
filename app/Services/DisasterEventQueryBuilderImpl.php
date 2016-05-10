@@ -19,8 +19,9 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
         $this->query = $database->table("disaster_events");
     }
 
-    public function date($date)
+    public function date($year, $month, $day)
     {
+        $date = $this->dateService->makeCertainDate($year,$month, $day);
         return $this->periodDate($date,$date);
     }
 
@@ -40,12 +41,12 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
 
     public function periodDate($date_start, $date_end)
     {
-        $this->query->orWhere(function($q) use ($date_end,$date_start) {
-                $q->where("date_start",">=",$date_start)->where("date_start","<=",$date_end);
-            })
+        $this->query->where(function($q) use ($date_end,$date_start) {
+                $q->where("date_start",">=",$date_start)->where("date_start","<=",$date_end)
             ->orWhere(function($q) use ($date_end,$date_start) {
                 $q->where("date_end",">=",$date_start)->where("date_end","<=",$date_end);
             });
+        });
         return $this;
     }
 
@@ -65,19 +66,29 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
 
     public function subdistrict($subdistrict_name)
     {
+        $this->joinWithDisasterAreas();
+        $this->joinWithVillages();
+        $this->distinct();
         $this->query->where("subdistrict","=",$subdistrict_name);
         return $this;
     }
 
     public function district($district_name)
     {
+        $this->joinWithDisasterAreas();
+        $this->joinWithVillages();
+        $this->distinct();
         $this->query->where("district","=",$district_name);
         return $this;
     }
 
     public function province($province_name)
     {
+        $this->joinWithDisasterAreas();
+        $this->joinWithVillages();
+        $this->distinct();
         $this->query->where("province","=",$province_name);
+        return $this;
     }
 
     public function type($type)
@@ -93,6 +104,7 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
     {
         $this->joinWithDisasterAreas();
         $this->joinWithVillages();
+        $this->distinct();
         $this->query->where("villages.id","=",$village_id);
         return $this;
     }
@@ -185,4 +197,11 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
     {
         return $this->query->getBindings();
     }
+
+    public function periodFromString($period) {
+        $startDate = $this->dateService->makeStartDateFromStringPeriod($period);
+        $endDate = $this->dateService->makeEndDateFromStringPeriod($period);
+        return $this->periodDate($startDate, $endDate);
+    }
+
 }

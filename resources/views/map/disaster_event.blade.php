@@ -55,7 +55,9 @@
         
         <label for="periodInput">Periods</label>
         <div class="input-group">
+            <button type="button" class="btn btn-secondary" id="useDateRange">Use Periods</button>
             <input type="text" id="disasterperiods" name="disasterperiods" value="" placeholder="Disaster periods..." >
+            <button type="button" class="btn btn-secondary" id="clearDateRange">Clear Periods</button>
         </div>
 
         <label for="locationInput">Location</label>
@@ -98,21 +100,20 @@
 </form>
 @endsection
 @section('script')
-	<script >
+	<script>
 		populateOpts();
-	</script>
-	<script type="text/javascript">
-        $(function() {
+	    $('#useDateRange').click(function() {
             $('input[name="disasterperiods"]').daterangepicker();
         });
-    </script>
-    <script>
+        $('#clearDateRange').click(function() {
+            $('input[name="disasterperiods"]').val('');
+        });
     	$('#executeButton').click(function(e) {
     		var formData = {
     			year : $('#year').val(),
     			month : $('#month').val(),
     			day : $('#day').val(),
-    			// disasterperiods : $('#disasterperiods').val(),
+    			disasterperiods : $('#disasterperiods').val(),
     			province : $('#province').val(),
     			district : $('#district').val(),
     			subdistrict : $('#subdistrict').val(),
@@ -132,11 +133,49 @@
                 data : formData
             }).done(function(data) {
                 console.log(data);
-                    var execQuery = data["executedQuery"];
-                    var execQueryField = document.getElementById("executedQuery");
-                    var textContent = document.createElement('p');
-                    var node = document.createTextNode(execQuery);
-                    textContent.appendChild(node);
+                var execQuery = data["executedQuery"];
+                var resultSet = data["resultSet"];
+                var execQueryField = $('div[name="executedQuery"]');
+                execQueryField.empty();
+                var textContent = document.createElement('p');
+                var node = document.createTextNode(execQuery);
+                textContent.appendChild(node);
+                execQueryField.append(textContent);
+
+                var resultField = $('div[name="resultSet"]');
+                resultField.empty();
+                var tableElement = document.createElement('table');
+                tableElement.setAttribute('id', 'resultTable');
+                // resultField.append(tableElement);
+                for (var i = 0; i < resultSet.length; i++) {
+                    var tableRow = tableElement.insertRow(i);
+                    var ctr = 0;
+                    for (var k in resultSet[i]) {
+                        var cell = tableRow.insertCell(ctr);
+                        cell.innerHTML = resultSet[i][k];
+                        ctr++;
+                    }
+                    var disasterChanges = tableRow.insertCell(ctr);
+                    var linkToChanges = document.createElement('a');
+                    linkToChanges.innerHTML = "See Changes";
+                    linkToChanges.setAttribute('href', 'http://localhost:8000/map/disaster_changes/' + resultSet[i]["id"]);
+                    linkToChanges.setAttribute('target', '_blank');
+                    disasterChanges.appendChild(linkToChanges);
+                    var getAffectedVillages = tableRow.insertCell(ctr+1);
+                    var linkToAffected = document.createElement('a');
+                    linkToAffected.innerHTML = "Affected Villages";
+                    linkToAffected.setAttribute('href', 'http://localhost:8000/map/affected_villages/' + resultSet[i]["id"]);
+                    linkToAffected.setAttribute('target', '_blank');
+                    getAffectedVillages.appendChild(linkToAffected);
+                    var getListVictims = tableRow.insertCell(ctr+2);
+                    var linkToVictims = document.createElement('a');
+                    linkToVictims.innerHTML = "List Victims";
+                    linkToVictims.setAttribute('href', 'http://localhost:8000/map/victims/' + resultSet[i]["id"]);
+                    linkToVictims.setAttribute('target', '_blank');
+                    getListVictims.appendChild(linkToVictims);
+                }
+                resultField.append(tableElement);
+
             }).fail(function(data) {
                 console.log('Error: ', data);
             });

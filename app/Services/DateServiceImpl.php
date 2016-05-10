@@ -13,7 +13,7 @@ class DateServiceImpl implements DateService
 
     public function makeStartDateFromYear($year)
     {
-        return $this->makeStartDateFromMonth($year,12);
+        return $this->makeStartDateFromMonth($year,1);
     }
 
     public function makeEndDateFromMonth($year, $month)
@@ -46,5 +46,21 @@ class DateServiceImpl implements DateService
     function is_leap_year($year)
     {
         return ((($year % 4) == 0) && ((($year % 100) != 0) || (($year %400) == 0)));
+    }
+
+    public function makeCertainDate($year, $month, $day) {
+        return sprintf("%d-%d-%d", $year, $month, $day);
+    }
+
+    public function makeStartDateFromStringPeriod($period) {
+        $dates = explode(" - ", $period);
+        $startDate = explode("/", $dates[0]);
+        return $this->makeCertainDate($startDate[2], $startDate[0], $startDate[1]);
+    }
+
+    public function makeEndDateFromStringPeriod($period) {
+        $dates = explode(" - ", $period);
+        $endDate = explode("/", $dates[1]);
+        return $this->makeCertainDate($endDate[2], $endDate[0], $endDate[1]);
     }
 }

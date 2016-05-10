@@ -54,16 +54,7 @@ class DimasController extends Controller
      */
     public function getDisasterEvents(Request $request,DisasterEventQueryBuilder $query)
     {
-        if ($request->has("disasterperiods")){
-            $query->date($request->input('disasterperiods'));
-        }
-        if ($request->has("year")){
-            if ($request->has("month")){
-                $query->month($request->input("year"),$request->input("month"));
-            } else {
-                $query->year($request->input("year"));
-            }
-        }
+        
         //TODO continue period date, certain village, etc.
         if ($request->has("disasterType")) {
             $query->type($request->input("disasterType"));
@@ -80,12 +71,26 @@ class DimasController extends Controller
         if ($request->has("village")) {
             $query->village($request->input("village"));
         }
+        if ($request->has("disasterperiods")){
+            $query->periodFromString($request->input('disasterperiods'));
+        }
+        if ($request->has("year")){
+            if ($request->has("month")){
+                if ($request->has("day")) {
+                    $query->date($request->input("year"),$request->input("month"), $request->input("day"));
+                } else {
+                    $query->month($request->input("year"),$request->input("month"));    
+                }
+            } else {
+                $query->year($request->input("year"));
+            }
+        }
         $query->select(["disaster_events.*"]);
         $data = $query->get();
         // dd($data);
         $retVal = [
             'resultSet' => $data,
-            'executedQuery' => $query->toString()
+            'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())
         ];
         return response()->json($retVal);
     }
@@ -165,12 +170,15 @@ class DimasController extends Controller
     public function getVictims(Request $request,VictimQueryBuilder $query)
     {
         $query->disasterEvent(1);
-        $query->disasterType('flood');
-        $query->date('2014-10-31');
-        $query->subdistrict('a subdistrict');
+        // $query->disasterType('flood');
+        // $query->date('2014-10-31');
+        // $query->subdistrict('a subdistrict');
         $data = $query->get();
-        dd($data);
-        return response()->json($data);
+        // dd($data);
+        return response()->json([
+            'resultSet' => $data,
+            'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())
+        ]);    
     }
 
     /**

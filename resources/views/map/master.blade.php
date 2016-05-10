@@ -93,14 +93,14 @@ echo session('response');
             <h3>Executed Query</h3>
         </div>
 
-        <div class="row" id="executedQuery">
+        <div class="row" id="executedQuery" name="executedQuery">
         </div>
 
         <div class="row">
             <h3>Result</h3>
         </div>
 
-        <div class="row" id="resultSet">
+        <div class="row" id="resultSet" name="resultSet">
             <!-- TODO: Use table; with angularJS maybe? -->
         </div>
 </div>

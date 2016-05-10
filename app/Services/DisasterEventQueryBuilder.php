@@ -99,10 +99,12 @@ interface DisasterEventQueryBuilder
     public function village($village_id);
 
     /**
-     * @param string $date example '2014-01-31'
+     * @param int $year
+     * @param int $month [1,12]
+     * @param int $day [1-31]
      * @return DisasterEventQueryBuilder
      */
-    public function date($date);
+    public function date($year, $month, $day);
 
     /**
      * @param int $year
@@ -139,5 +141,7 @@ interface DisasterEventQueryBuilder
      * @return DisasterEventQueryBuilder
      */
     public function periodYear($year_start, $year_end);
+
+    public function periodFromString($period);
 
 }

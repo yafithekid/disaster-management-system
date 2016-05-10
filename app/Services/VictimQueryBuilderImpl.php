@@ -342,4 +342,13 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
         $this->query->orderBy($column,$ord);
         return $this;
     }
+
+    /**
+     * return the bindings
+     * @return array
+     */
+    public function bindings()
+    {
+        return $this->query->getBindings();
+    }
 }

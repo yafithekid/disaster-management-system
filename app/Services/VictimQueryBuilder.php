@@ -164,4 +164,10 @@ interface VictimQueryBuilder
      * @return VictimQueryBuilder
      */
     public function refugeCamp($refuge_camp);
+
+    /**
+     * return the bindings
+     * @return array
+     */
+    public function bindings();
 }
