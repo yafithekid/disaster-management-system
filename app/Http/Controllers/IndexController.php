@@ -22,10 +22,10 @@ class IndexController extends Controller
     	// JavaScript::put([
     	// 	'villageOpts' => $resVillages
     	// ]);
-    	return view('index', [
+    	return [
     		'provinces' => $resProvince,
     		'types' => $resDisasterType
-    		]);
+    		];
     }
 
     public function populateDistricts(Request $request) {

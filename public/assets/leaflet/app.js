@@ -66,6 +66,30 @@ function addMarkerToMap(response) {
 
 
 // OPTIONS POPULATION
+function populateOpts() {
+	var provinceSelect = $('select[name="province"]');
+	var disasterTypeSelect = $('select[name="disasterType"]');
+	$.get('http://localhost:8000/index/populate-provinces'
+	).done(function(Opts) {
+		console.log(Opts);
+		var prov = Opts["provinces"];
+		var disasterT = Opts["types"];
+		for (var i = 0; i < prov.length; i++) {
+			var optval = document.createElement('option');
+			optval.text = prov[i];
+			optval.value = prov[i];
+			provinceSelect.append(optval);
+		}
+		for (var i = 0; i < disasterT.length; i++) {
+			var optval2 = document.createElement('option');
+			optval2.text = disasterT[i];
+			optval2.value = disasterT[i];
+			disasterTypeSelect.append(optval2);
+		}
+	}).fail(function(data) {
+		alert("error");
+	});
+}
 
 function populateDistrict(province) {
 	var districtSelect2 = $('select[name="district"]');
@@ -73,7 +97,7 @@ function populateDistrict(province) {
 		districtSelect2.empty();
 		var optUnset = document.createElement('option');
 		optUnset.text = "Unset";
-		optUnset.value = null;
+		optUnset.value = "";
 		districtSelect2.append(optUnset);
 	}
 
@@ -100,7 +124,7 @@ function populateSubdistrict(district) {
 		subdistrictSelect.empty();
 		var optUnset = document.createElement('option');
 		optUnset.text = "Unset";
-		optUnset.value = null;
+		optUnset.value = "";
 		subdistrictSelect.append(optUnset);
 	}
 
@@ -127,7 +151,7 @@ function populateVillage(subdistrict) {
 		villageSelect.empty();
 		var optUnset = document.createElement('option');
 		optUnset.text = "Unset";
-		optUnset.value = null;
+		optUnset.value = "";
 		villageSelect.append(optUnset);
 	}
 
@@ -149,4 +173,36 @@ function populateVillage(subdistrict) {
 	}).fail(function(data) {
 		alert("error");
 	});
+}
+
+function generateDayOpts(month, year) {
+	console.log(month);
+	console.log(year);
+	var numOfDay;
+	var daySelect = $('select[name="day"]');
+	if (!daySelect.attr('disabled')) {
+		daySelect.empty();
+		var optUnset = document.createElement('option');
+		optUnset.text = "Unset";
+		optUnset.value = null;
+		daySelect.append(optUnset);
+	}
+	if (month === "1" || month === "3" || month === "5" || month === "7" || month === "8" || month === "10" || month === "12") {
+		numOfDay = 31;
+	} else if (month === "4" || month === "6" || month === "9" || month === "11") {
+		numOfDay = 30;
+	} else {
+		if (year%4 === 0) {
+			numOfDay = 29;
+		} else {
+			numOfDay = 28;
+		}
+	}
+	daySelect.prop('disabled', false);
+	for (var i = 1 ; i <= numOfDay; i++) {
+		var optval = document.createElement('option');
+		optval.text = i;
+		optval.value = i;
+		daySelect.append(optval);
+	}
 }

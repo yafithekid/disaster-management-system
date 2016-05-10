@@ -53,8 +53,8 @@ class DimasController extends Controller
      */
     public function getDisasterEvents(Request $request,DisasterEventQueryBuilder $query)
     {
-        if ($request->has("date")){
-            $query->date($request->input('date'));
+        if ($request->has("disasterperiods")){
+            $query->date($request->input('disasterperiods'));
         }
         if ($request->has("year")){
             if ($request->has("month")){
@@ -64,15 +64,29 @@ class DimasController extends Controller
             }
         }
         //TODO continue period date, certain village, etc.
-        $query->type("a type");
-        $query->village(1);
-        $query->subdistrict("a subdistrict");
-        $query->district("a district");
-        $query->province("a province");
+        if ($request->has("disasterType")) {
+            $query->type($request->input("disasterType"));
+        }
+        if ($request->has("province")) {
+            $query->province($request->input("province"));
+        }
+        if ($request->has("district")) {
+            $query->district($request->input("district"));
+        }
+        if ($request->has("subdistrict")) {
+            $query->subdistrict($request->input("subdistrict"));
+        }
+        if ($request->has("village")) {
+            $query->village($request->input("village"));
+        }
         $query->select(["disaster_events.*"]);
         $data = $query->get();
-        dd($data);
-        return response()->json($data);
+        // dd($data);
+        $retVal = [
+            'resultSet' => $data,
+            'executedQuery' => $query->toString();
+        ];
+        return response()->json($retVal);
     }
 
     /**
@@ -229,8 +243,4 @@ class DimasController extends Controller
         return response()->json($query->count());
     }
 
-    public function testMethod(Request $request) {
-        echo ("test hahaha");
-        return redirect()->route('welcome');
-    }
 }

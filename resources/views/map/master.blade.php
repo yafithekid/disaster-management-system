@@ -16,6 +16,7 @@ echo session('response');
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>DIMAS</title>
 
@@ -77,19 +78,33 @@ echo session('response');
     </div>
     <!-- /.container -->
 </nav>
-
 <!-- Page Content -->
 <div class="container">
 
     <div class="row">
         <div id="mapid">
+        </div>
     </div>
+    <div class="row">
+        @yield('form')
+        
     </div>
+    <div class="row">
+            <h3>Executed Query</h3>
+        </div>
+
+        <div class="row" id="executedQuery">
+        </div>
+
+        <div class="row">
+            <h3>Result</h3>
+        </div>
+
+        <div class="row" id="resultSet">
+            <!-- TODO: Use table; with angularJS maybe? -->
+        </div>
 </div>
-<div class="row">
-    @yield('form')
-    
-</div>
+
 <!-- /.container -->
 
 <!-- jQuery Version 1.11.1 -->

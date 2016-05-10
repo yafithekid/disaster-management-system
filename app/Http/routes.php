@@ -12,14 +12,17 @@
 */
 
 Route::get('/draw',['uses'=>'InputController@getDraw']);
+
 Route::get('/map/disaster_event',['uses'=>'MapController@getDisasterEvent']);
 Route::get('/map/med_fac',['uses'=>'MapController@getMedicalFacilities']);
+
 Route::get('/index', ['as' => 'index', 'uses' => 'IndexController@populateOpts', function () {
     return view('index');
 }]);
 Route::get('/index/populate-districts', ['uses' => 'IndexController@populateDistricts']);
 Route::get('/index/populate-subdistricts', ['uses' => 'IndexController@populateSubdistricts']);
 Route::get('/index/populate-villages', ['uses' => 'IndexController@populateVillages']);
+Route::get('/index/populate-provinces', ['uses' => 'IndexController@populateOpts']);
 Route::get('/result', function() {
 	return view('result');
 });
@@ -38,5 +41,3 @@ Route::get('/dimas/victims',['uses'=>'DimasController@getVictims']);
 Route::get('/dimas/refuge-camps',['uses'=>'DimasController@getRefugeCamps']);
 Route::get('/dimas/medical-facilities',['uses'=>'DimasController@getMedicalFacilities']);
 Route::get('/dimas/number-of-victims',['uses'=>'DimasController@getNumberOfVictims']);
-
-Route::get('/dimas/test-method', ['uses' => 'DimasController@testMethod']);
