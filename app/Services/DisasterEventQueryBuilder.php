@@ -3,6 +3,8 @@
 namespace App\Services;
 interface DisasterEventQueryBuilder
 {
+    public function orderBy($column,$ord);
+    
     public function joinWithVillages();
     /**
      * join dengan disaster areas
@@ -38,6 +40,12 @@ interface DisasterEventQueryBuilder
      * @return string
      */
     public function sql();
+
+    /**
+     * return the bindings
+     * @return array
+     */
+    public function bindings();
 
     /**
      * run the query and return as array
