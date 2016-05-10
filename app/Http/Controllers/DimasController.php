@@ -140,10 +140,13 @@ class DimasController extends Controller
     public function getVillagesAffected(Request $request,VillageQueryBuilder $query)
     {
         $query->disasterEvent(1);
-        $query->disasterType('flood');
-        $query->month(2014,1);
+//        $query->disasterType('flood');
+//        $query->month(2014,1);
+//        dd($query->sql());
+        $query->select(["villages.*"]);
+        $query->distinct();
         $data = $query->get();
-        dd($data);
+//        dd($data);
         return response()->json($data);
     }
 

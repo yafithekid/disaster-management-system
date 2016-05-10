@@ -71,5 +71,7 @@ interface VillageQueryBuilder
      * @return VillageQueryBuilder
      */
     public function year($year);
+    
+    public function joinWithDisasterAreas();
 
 }
