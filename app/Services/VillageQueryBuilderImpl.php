@@ -24,7 +24,7 @@ class VillageQueryBuilderImpl implements VillageQueryBuilder
     public function __construct(Connection $database, DateService $dateService)
     {
         $this->dateService = $dateService;
-        $this->query = $database->table("victims");
+        $this->query = $database->table("villages");
     }
 
     /**
@@ -127,7 +127,8 @@ class VillageQueryBuilderImpl implements VillageQueryBuilder
     {
         if (!$this->join_with_disaster_events){
             $this->join_with_disaster_events = true;
-            $this->query->crossJoin("disaster_events");
+            $this->joinWithDisasters();
+            $this->query->join("disaster_events","disaster_events.id","=","disasters.disaster_event_id");
         }
     }
 
@@ -135,17 +136,17 @@ class VillageQueryBuilderImpl implements VillageQueryBuilder
     {
         if (!$this->join_with_disasters){
             $this->join_with_disasters = true;
-            $this->joinWithDisasterEvents();
-            $this->query->join("disasters","disaster_events.id","=","disasters.disaster_event_id");
+            $this->joinWithDisasterAreas();
+            $this->query->join("disasters","disaster_areas.disaster_id","=","disasters.id");
         }
     }
 
-    private function joinWithDisasterAreas()
+    public function joinWithDisasterAreas()
     {
         if (!$this->join_with_disaster_areas) {
             $this->join_with_disaster_areas = true;
-            $this->joinWithDisasters();
-            $this->query->join("disaster_areas", "disasters.id", "=", "disaster_areas.disaster_id");
+            $this->query->crossJoin("disaster_areas")
+                ->whereRaw("ST_Intersects(villages.geom,disaster_areas.region)");
         }
     }
 

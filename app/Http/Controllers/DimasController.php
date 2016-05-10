@@ -19,6 +19,7 @@ class DimasController extends Controller
     private $db;
     const DEBUG = false;
 
+
     public function __construct(Connection $database)
     {
         $this->db = $database;
@@ -84,7 +85,7 @@ class DimasController extends Controller
         // dd($data);
         $retVal = [
             'resultSet' => $data,
-            'executedQuery' => $query->toString();
+            'executedQuery' => $query->toString()
         ];
         return response()->json($retVal);
     }
@@ -97,17 +98,22 @@ class DimasController extends Controller
      */
     public function getDisasterEventChanges(Request $request,DisasterEventQueryBuilder $query)
     {
-        $query->joinWithDisasterAreas();
+        $query->joinWithDisasterAreas()->orderBy("disaster_areas.start","asc");
+        $query->id($request->input("id"));
         $query->select([
+            $this->db->raw("ST_AsGeoJSON(ST_Centroid(disaster_areas.region)) AS centroid"),
             "disaster_events.*","disaster_areas.*",$this->db->raw("ST_AsGeoJSON(disaster_areas.region) AS region")
         ]);
-
         $data = $query->get();
+
         foreach ($data as $datum){
+            $datum->centroid = GeoJson::jsonUnserialize(json_decode($datum->centroid));
             $datum->region = GeoJson::jsonUnserialize(json_decode($datum->region));
         }
-        dd($data);
-        return response()->json($data);
+        return response()->json([
+            'resultSet' => $data,
+            'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())
+        ]);
     }
 
     /**
@@ -140,10 +146,13 @@ class DimasController extends Controller
     public function getVillagesAffected(Request $request,VillageQueryBuilder $query)
     {
         $query->disasterEvent(1);
-        $query->disasterType('flood');
-        $query->month(2014,1);
+//        $query->disasterType('flood');
+//        $query->month(2014,1);
+//        dd($query->sql());
+        $query->select(["villages.*"]);
+        $query->distinct();
         $data = $query->get();
-        dd($data);
+//        dd($data);
         return response()->json($data);
     }
 
@@ -243,4 +252,20 @@ class DimasController extends Controller
         return response()->json($query->count());
     }
 
+    private function createSQLRawQuery($query,$bindings){
+        // Format binding data for sql insertion
+        foreach ($bindings as $i => $binding) {
+            if ($binding instanceof \DateTime) {
+                $bindings[$i] = $binding->format('\'Y-m-d H:i:s\'');
+            } else if (is_string($binding)) {
+                $bindings[$i] = "'$binding'";
+            }
+        }
+
+        // Insert bindings into query
+        $query = str_replace(array('%', '?'), array('%%', '%s'), $query);
+        $query = vsprintf($query, $bindings);
+
+        return $query;
+    }
 }

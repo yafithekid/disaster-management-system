@@ -104,7 +104,7 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
 
     public function id($id)
     {
-        $this->query->where("id","=",$id);
+        $this->query->where("disaster_events.id","=",$id);
         return $this;
     }
 
@@ -171,4 +171,18 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
         return $this;
     }
 
+    public function orderBy($column, $ord)
+    {
+        $this->query->orderBy($column,$ord);
+        return $this;
+    }
+
+    /**
+     * return the bindings
+     * @return array
+     */
+    public function bindings()
+    {
+        return $this->query->getBindings();
+    }
 }
