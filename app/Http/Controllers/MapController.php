@@ -22,5 +22,8 @@ class MapController extends Controller
 
     public function getVictims($id) {
         return view('map.victims', ['id' => $id]);
+    
+    public function getVictimMovements(){
+    	return view('map.victim_movements');
     }
 }
