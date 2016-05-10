@@ -41,3 +41,10 @@ Route::get('/dimas/victims',['uses'=>'DimasController@getVictims']);
 Route::get('/dimas/refuge-camps',['uses'=>'DimasController@getRefugeCamps']);
 Route::get('/dimas/medical-facilities',['uses'=>'DimasController@getMedicalFacilities']);
 Route::get('/dimas/number-of-victims',['uses'=>'DimasController@getNumberOfVictims']);
+Route::get('/dimas/test-method', ['uses' => 'DimasController@testMethod']);
+
+Route::get('/datafix/reverse-med-fac',['uses'=>'DatafixController@reverseMedFac']);
+Route::get('/datafix/reverse-ref-cmp',['uses'=>'DatafixController@reverseRefCmp']);
+Route::get('/datafix/reverse-vic-loc',['uses'=>'DatafixController@reverseVicLoc']);
+Route::get('/datafix/reverse-disaster-area',['uses'=>'DatafixController@reverseDisasterArea']);
+Route::get('/datafix/push-disaster-area',['uses'=>'DatafixController@pushDisasterArea']);
