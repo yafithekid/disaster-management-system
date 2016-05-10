@@ -15,7 +15,7 @@
 <script>
     var refresh = function(){
         var villageId = 10346;
-        $.get( "/dimas/medical-facilities?villageId="+villageId).done(function( data ) {
+        $.get( "/dimas/medical-facilities?villageId="+villageId, function( data ) {
             console.log(data);
         });
     }
