@@ -57,4 +57,10 @@ interface MedicalFacilityQueryBuilder
      * @return MedicalFacilityQueryBuilder
      */
     public function province($province_name);
+
+    /**
+     * return the bindings
+     * @return array
+     */
+    public function bindings();
 }

@@ -189,25 +189,33 @@ class DimasController extends Controller
      */
     public function getRefugeCamps(Request $request,RefugeCampQueryBuilder $query)
     {
-        echo $request->input("province")."\n";
-        echo $request->input("district")."\n";
-        echo $request->input("subdistrict")."\n";
-        echo $request->input("village")."\n";
-        echo $request;
-        $query->villageId($request->input("village"));
-        $query->select(["refuge_camps.*",$this->db->raw("ST_AsGeoJSON(location, 4326) AS location")]);
-        $data = $query->get();
-        $features = array();
-        foreach ($data as $datum) {
-            $datum->location = GeoJson::jsonUnserialize(json_decode($datum->location));
-            $features[] = array(
-                    'type' => 'Feature',
-                    'geometry' => $datum->location,
-                    'properties' => array('name' => $datum->name, 'capacity' => $datum->capacity, 'type' => $datum->type),
-                    );
+        if($request->has('village')) {
+            $query->villageId($request->input('village'));    
         }
-        // dd($data);
-        // $response = response()->json($data);
+        if($request->has('subdistrict')) {
+            $query->subdistrict($request->input('subdistrict'));
+        }
+        if($request->has('district')) {
+            $query->district($request->input('district'));
+        }
+        if($request->has('province')) {
+            $query->province($request->input('province'));
+        }
+
+        //$query->villageId(10346);
+
+        $query->select(["refuge_camps.*",$this->db->raw("ST_AsGeoJSON(location) AS location")])->distinct();
+        // $query->select(["refuge_camps.*"])->distinct();
+        
+        $data = $query->get();
+        foreach ($data as $datum){
+            $datum->location = GeoJson::jsonUnserialize(json_decode($datum->location));
+        }
+        
+        return response()->json([
+            'resultSet' => $data,
+            'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())
+        ]);
 
         //constructing geojson object
         // $original_data = json_decode($response, true);
@@ -219,9 +227,9 @@ class DimasController extends Controller
         //             );
         //     };   
 
-        $allfeatures = array('type' => 'FeatureCollection', 'features' => $features);
-        $response = response()->json($allfeatures);
-        return redirect()->route('index')->with('response', $response);
+        // $allfeatures = array('type' => 'FeatureCollection', 'features' => $features);
+        // $response = response()->json($allfeatures);
+        // return redirect()->route('index')->with('response', $response);
     }
 
     /**
@@ -232,13 +240,33 @@ class DimasController extends Controller
      */
     public function getMedicalFacilities(Request $request,MedicalFacilityQueryBuilder $query)
     {
-        $query->villageId($request->input('villageId'));
+        
+        if($request->has('village')) {
+            $query->villageId($request->input('village'));    
+        }
+        if($request->has('subdistrict')) {
+            $query->subdistrict($request->input('subdistrict'));
+        }
+        if($request->has('district')) {
+            $query->district($request->input('district'));
+        }
+        if($request->has('province')) {
+            $query->province($request->input('province'));
+        }
+
         $query->select(["medical_facilities.*",$this->db->raw("ST_AsGeoJSON(location) AS location")])->distinct();
         $data = $query->get();
         foreach ($data as $datum){
             $datum->location = GeoJson::jsonUnserialize(json_decode($datum->location));
         }
-        return response()->json($data);
+        //return response()->json($data);
+
+        //$data = $query->get();
+        // dd($data);
+        return response()->json([
+            'resultSet' => $data,
+            'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())
+        ]);
     }
 
     /**

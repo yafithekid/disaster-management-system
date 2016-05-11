@@ -96,4 +96,13 @@ class MedicalFacilityQueryBuilderImpl implements MedicalFacilityQueryBuilder
         $this->query->distinct();
         return $this;
     }
+
+    /**
+     * return the bindings
+     * @return array
+     */
+    public function bindings()
+    {
+        return $this->query->getBindings();
+    }
 }
