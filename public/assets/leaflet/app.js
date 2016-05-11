@@ -184,7 +184,7 @@ function generateDayOpts(month, year) {
 		daySelect.empty();
 		var optUnset = document.createElement('option');
 		optUnset.text = "Unset";
-		optUnset.value = null;
+		optUnset.value = "";
 		daySelect.append(optUnset);
 	}
 	if (month === "1" || month === "3" || month === "5" || month === "7" || month === "8" || month === "10" || month === "12") {
