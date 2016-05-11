@@ -141,7 +141,10 @@ class DimasController extends Controller
             $datum->point = GeoJson::jsonUnserialize(json_decode($datum->point));
         }
         // dd($data);
-        return response()->json($data);
+        return response()->json([
+            'resultSet' => $data,
+            'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())
+        ]);
     }
 
     /**
