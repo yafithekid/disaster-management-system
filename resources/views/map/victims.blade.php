@@ -204,15 +204,13 @@
     });
     
     $('#counterCategory').change(function() {
+        var typefield = $('input[name="type"]');
         if ($('#counterCategory').val() === "refcamp" || $('#counterCategory').val() === "medfac") {
-            var typefield = $('input[name="type"]');
             typefield.prop('hidden', false);
             console.log("medfacorrefcamp");
-            var rowCounter = $('div[name="rowCounter"]');
-            var inputText = document.createElement('input');
-            inputText.setAttribute('id', 'type');
-            inputText.setAttribute('type', 'text');
-            rowCounter.append(inputText);
+            
+        } else {
+            typefield.prop('hidden', true);
         }
     });
 
