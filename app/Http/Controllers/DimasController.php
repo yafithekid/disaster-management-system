@@ -54,7 +54,9 @@ class DimasController extends Controller
      */
     public function getDisasterEvents(Request $request,DisasterEventQueryBuilder $query)
     {
-        
+        if ($request->has("id")){
+            $query->id($request->input("id"));
+        }
         //TODO continue period date, certain village, etc.
         if ($request->has("disasterType")) {
             $query->type($request->input("disasterType"));
@@ -139,7 +141,10 @@ class DimasController extends Controller
             $datum->point = GeoJson::jsonUnserialize(json_decode($datum->point));
         }
         // dd($data);
-        return response()->json($data);
+        return response()->json([
+            'resultSet' => $data,
+            'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())
+        ]);
     }
 
     /**
@@ -150,15 +155,34 @@ class DimasController extends Controller
      */
     public function getVillagesAffected(Request $request,VillageQueryBuilder $query)
     {
-        $query->disasterEvent(1);
-//        $query->disasterType('flood');
-//        $query->month(2014,1);
-//        dd($query->sql());
-        $query->select(["villages.*"]);
+        $query->leftJoinWithDisasterHitVillages();
+        if ($request->has('disasterEventId')){
+            $query->disasterEvent($request->input('disasterEventId'));
+        }
+        if ($request->has("type")){
+            $query->disasterType($request->input("type"));
+        }
+        if ($request->has("year")){
+            if ($request->has("month")){
+                if ($request->has("day")) {
+                    $query->date($request->input("year")."-".$request->input("month")."-".$request->input("day"));
+                } else {
+                    $query->month($request->input("year"),$request->input("month"));
+                }
+            } else {
+                $query->year($request->input("year"));
+            }
+        }
+        $query->select(["villages.*","disaster_hit_villages.weather_condition","disaster_hit_villages.start",$this->db->raw("ST_AsGeoJSON(villages.geom) AS geom")]);
         $query->distinct();
         $data = $query->get();
-//        dd($data);
-        return response()->json($data);
+        foreach ($data as $datum){
+            $datum->geom = GeoJson::jsonUnserialize(json_decode($datum->geom));
+        }
+        return response()->json([
+            'resultSet'=>$data,
+            'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())
+        ]);
     }
 
     /**
@@ -211,25 +235,33 @@ class DimasController extends Controller
      */
     public function getRefugeCamps(Request $request,RefugeCampQueryBuilder $query)
     {
-        echo $request->input("province")."\n";
-        echo $request->input("district")."\n";
-        echo $request->input("subdistrict")."\n";
-        echo $request->input("village")."\n";
-        echo $request;
-        $query->villageId($request->input("village"));
-        $query->select(["refuge_camps.*",$this->db->raw("ST_AsGeoJSON(location, 4326) AS location")]);
-        $data = $query->get();
-        $features = array();
-        foreach ($data as $datum) {
-            $datum->location = GeoJson::jsonUnserialize(json_decode($datum->location));
-            $features[] = array(
-                    'type' => 'Feature',
-                    'geometry' => $datum->location,
-                    'properties' => array('name' => $datum->name, 'capacity' => $datum->capacity, 'type' => $datum->type),
-                    );
+        if($request->has('village')) {
+            $query->villageId($request->input('village'));    
         }
-        // dd($data);
-        // $response = response()->json($data);
+        if($request->has('subdistrict')) {
+            $query->subdistrict($request->input('subdistrict'));
+        }
+        if($request->has('district')) {
+            $query->district($request->input('district'));
+        }
+        if($request->has('province')) {
+            $query->province($request->input('province'));
+        }
+
+        //$query->villageId(10346);
+
+        $query->select(["refuge_camps.*",$this->db->raw("ST_AsGeoJSON(location) AS location")])->distinct();
+        // $query->select(["refuge_camps.*"])->distinct();
+        
+        $data = $query->get();
+        foreach ($data as $datum){
+            $datum->location = GeoJson::jsonUnserialize(json_decode($datum->location));
+        }
+        
+        return response()->json([
+            'resultSet' => $data,
+            'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())
+        ]);
 
         //constructing geojson object
         // $original_data = json_decode($response, true);
@@ -241,9 +273,9 @@ class DimasController extends Controller
         //             );
         //     };   
 
-        $allfeatures = array('type' => 'FeatureCollection', 'features' => $features);
-        $response = response()->json($allfeatures);
-        return redirect()->route('index')->with('response', $response);
+        // $allfeatures = array('type' => 'FeatureCollection', 'features' => $features);
+        // $response = response()->json($allfeatures);
+        // return redirect()->route('index')->with('response', $response);
     }
 
     /**
@@ -254,13 +286,33 @@ class DimasController extends Controller
      */
     public function getMedicalFacilities(Request $request,MedicalFacilityQueryBuilder $query)
     {
-        $query->villageId($request->input('villageId'));
+        
+        if($request->has('village')) {
+            $query->villageId($request->input('village'));    
+        }
+        if($request->has('subdistrict')) {
+            $query->subdistrict($request->input('subdistrict'));
+        }
+        if($request->has('district')) {
+            $query->district($request->input('district'));
+        }
+        if($request->has('province')) {
+            $query->province($request->input('province'));
+        }
+
         $query->select(["medical_facilities.*",$this->db->raw("ST_AsGeoJSON(location) AS location")])->distinct();
         $data = $query->get();
         foreach ($data as $datum){
             $datum->location = GeoJson::jsonUnserialize(json_decode($datum->location));
         }
-        return response()->json($data);
+        //return response()->json($data);
+
+        //$data = $query->get();
+        // dd($data);
+        return response()->json([
+            'resultSet' => $data,
+            'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())
+        ]);
     }
 
     /**
@@ -291,6 +343,39 @@ class DimasController extends Controller
             'resultSet' => $query->first()->count,
             'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())
         ]);    
+    }
+
+    /**
+     * @param int $disaster_event_id disaster events id
+     * @param Request $request
+     * @param DisasterEventQueryBuilder $query
+     */
+    public function getAggregatedAreas($disaster_event_id, Request $request, DisasterEventQueryBuilder $query){
+        $query->joinWithDisasterAreas();
+        $query->id($disaster_event_id);
+        $query->select([$this->db->raw("ST_AsGeoJSON(ST_Union(disaster_areas.region)) AS area")]);
+        if ($request->has("type")){
+            $query->disasterType($request->input("type"));
+        }
+        if ($request->has("year")){
+            if ($request->has("month")){
+                if ($request->has("day")) {
+                    $query->date($request->input("year"),$request->input("month"),$request->input("day"));
+                } else {
+                    $query->month($request->input("year"),$request->input("month"));
+                }
+            } else {
+                $query->year($request->input("year"));
+            }
+        }
+        $data = $query->get();
+        foreach ($data as $datum){
+            $datum->area = GeoJson::jsonUnserialize(json_decode($datum->area));
+        }
+        return response()->json([
+            'resultSet' => $data,
+            'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())
+        ]);
     }
 
     private function createSQLRawQuery($query,$bindings){

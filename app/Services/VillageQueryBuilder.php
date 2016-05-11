@@ -5,6 +5,7 @@ namespace App\Services;
 
 interface VillageQueryBuilder
 {
+    public function bindings();
     /**
      * @param array $array
      * @return VillageQueryBuilder
@@ -71,7 +72,11 @@ interface VillageQueryBuilder
      * @return VillageQueryBuilder
      */
     public function year($year);
+
+    public function disasterAreaId($id);
     
     public function joinWithDisasterAreas();
+
+    public function leftJoinWithDisasterHitVillages();
 
 }
