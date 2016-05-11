@@ -219,6 +219,14 @@
             category : $('#counterCategory').val(),
             valuecat : $('#catVal').val(),
             type : $('#type').val(),
+            year : $('#year').val(),
+            month : $('#month').val(),
+            day : $('#day').val(),
+            province : $('#province').val(),
+            district : $('#district').val(),
+            subdistrict : $('#subdistrict').val(),
+            village : $('#village').val(),
+            disasterType : $('#disasterType').val(),
             id : disasEventId
         };
 
