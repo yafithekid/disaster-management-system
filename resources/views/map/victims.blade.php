@@ -116,6 +116,8 @@
 @endsection
 @section('script')
 <script>
+    //hide map
+    $("#mapid").hide();
     populateOpts();
    //get victims data from server
     var disasEventId = '{{$id}}';
@@ -142,7 +144,7 @@
             var victimMovement = tableRow.insertCell(1);
             var linkToMovement = document.createElement('a');
             linkToMovement.innerHTML = "See Movement";
-            linkToMovement.setAttribute('href', 'http://localhost:8000/map/victim_mov/' + data[i]["id"]);
+            linkToMovement.setAttribute('href', 'http://localhost:8000/map/victim_mov?id=' + data[i]["id"]);
             linkToMovement.setAttribute('target', '_blank');
             victimMovement.appendChild(linkToMovement);
             
@@ -192,7 +194,7 @@
                 var victimMovement = tableRow.insertCell(1);
                 var linkToMovement = document.createElement('a');
                 linkToMovement.innerHTML = "See Movement";
-                linkToMovement.setAttribute('href', 'http://localhost:8000/map/victim_mov/' + data[i]["id"]);
+                linkToMovement.setAttribute('href', 'http://localhost:8000/map/victim_mov?id=' + data[i]["id"]);
                 linkToMovement.setAttribute('target', '_blank');
                 victimMovement.appendChild(linkToMovement);
             }

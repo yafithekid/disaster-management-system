@@ -1,7 +1,7 @@
 @extends('map.master')
 @section('form')
     <label>Victim ID</label>
-    <input id="village_id"/>
+    <input id="village_id" @if(isset($id)) value="{{$id}}" @endif/>
     <a onclick="refresh()" class="btn btn-primary">Show</a>
 @endsection
 @section('script')

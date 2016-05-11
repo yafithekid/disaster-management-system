@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\Services\DisasterEventQueryBuilder;
+use Illuminate\Http\Request;
 
 class MapController extends Controller
 {
@@ -30,8 +31,12 @@ class MapController extends Controller
         return view('map.victims', ['id' => $id]);
     }
     
-    public function getVictimMovements(){
-    	return view('map.victim_movements');
+    public function getVictimMovements(Request $request){
+    	$array = [];
+        if ($request->has('id')){
+            $array ['id'] = $request->input('id');
+        }
+        return view('map.victim_movements',$array);
     }
     
     public function getAffectedVillages($disaster_event_id)
