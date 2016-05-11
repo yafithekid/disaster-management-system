@@ -155,6 +155,7 @@ class DimasController extends Controller
      */
     public function getVillagesAffected(Request $request,VillageQueryBuilder $query)
     {
+        $query->leftJoinWithDisasterHitVillages();
         if ($request->has('disasterEventId')){
             $query->disasterEvent($request->input('disasterEventId'));
         }
@@ -172,7 +173,7 @@ class DimasController extends Controller
                 $query->year($request->input("year"));
             }
         }
-        $query->select(["villages.*",$this->db->raw("ST_AsGeoJSON(villages.geom) AS geom")]);
+        $query->select(["villages.*","disaster_hit_villages.weather_condition","disaster_hit_villages.start",$this->db->raw("ST_AsGeoJSON(villages.geom) AS geom")]);
         $query->distinct();
         $data = $query->get();
         foreach ($data as $datum){

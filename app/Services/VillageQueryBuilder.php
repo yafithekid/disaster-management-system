@@ -77,4 +77,6 @@ interface VillageQueryBuilder
     
     public function joinWithDisasterAreas();
 
+    public function leftJoinWithDisasterHitVillages();
+
 }

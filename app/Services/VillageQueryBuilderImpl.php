@@ -179,4 +179,14 @@ class VillageQueryBuilderImpl implements VillageQueryBuilder
     {
         return $this->query->getBindings();
     }
+
+    public function leftJoinWithDisasterHitVillages()
+    {
+        $this->joinWithDisasterEvents();
+        $this->query->leftJoin("disaster_hit_villages",function($join) {
+            $join->on("villages.id", "=", "disaster_hit_villages.village_id");
+            $join->on("disaster_events.id", "=", "disaster_hit_villages.disaster_event_id");
+        });
+        return $this;
+    }
 }

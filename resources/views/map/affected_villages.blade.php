@@ -117,6 +117,14 @@
             $("#refreshButton").hide();
             $("#executedQuery").html(data.executedQuery);
             renderGeoData(data.resultSet);
+            var table = document.createElement("table");
+            $(table).attr("class","table table-striped table-condensed");
+            $(table).append("<tr><th>Village Name</th><th>Weather</th><th>Start</th></tr>");
+            data.resultSet.forEach(function(dArea){
+                $(table).append("<tr><td>"+dArea.name+"</td><td>"+dArea.weather_condition+"</td><td>"+dArea.start+"</td></tr>");
+            });
+            $("#resultSet").append(table);
+//            $("#resultSet").append(appended);
         }).fail(function(data){
             alert(data);
         });
@@ -128,7 +136,8 @@
             var resultSet = data.resultSet;
             resultSet.forEach(function(dArea){
                 var geoJson = L.geoJson(dArea.area);
-                geoJson.addTo(mymap).setStyle({fillColor:"#ff0000"});
+                var layer = geoJson.addTo(mymap);
+                layer.setStyle({fillColor:"#ff0000"});
             });
         }).fail(function(data){
 
