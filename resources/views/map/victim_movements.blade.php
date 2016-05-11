@@ -21,7 +21,7 @@
             sql = data.executedQuery;
 
             if(layerGroup.getLayers().length>0){
-                layerGroup.clearLayers(addTypeDiv(victimData[0]));
+                layerGroup.clearLayers();
             }
 
             var resultTableBody = resultTable.find("tbody");
