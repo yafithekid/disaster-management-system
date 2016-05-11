@@ -100,6 +100,11 @@ echo session('response');
             <h3>Result</h3>
         </div>
 
+        <div class="row">
+            @section('counter')
+            @show
+        </div>
+
         <div class="row" id="resultSet" name="resultSet">
             <!-- TODO: Use table; with angularJS maybe? -->
         </div>

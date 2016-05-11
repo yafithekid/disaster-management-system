@@ -169,12 +169,34 @@ class DimasController extends Controller
      */
     public function getVictims(Request $request,VictimQueryBuilder $query)
     {
-        $query->disasterEvent(1);
-        // $query->disasterType('flood');
-        // $query->date('2014-10-31');
-        // $query->subdistrict('a subdistrict');
+        $query->disasterEvent($request->input("id"));
+        if ($request->has("disasterType")) {
+            $query->disasterType($request->input("disasterType"));
+        }
+        if ($request->has("year")){
+            if ($request->has("month")){
+                if ($request->has("day")) {
+                    $query->date($request->input("year")."-".$request->input("month")."-".$request->input("day"));
+                } else {
+                    $query->month($request->input("year"),$request->input("month"));    
+                }
+            } else {
+                $query->year($request->input("year"));
+            }
+        }
+        if ($request->has("province")) {
+            $query->province($request->input("province"));
+        }
+        if ($request->has("district")) {
+            $query->district($request->input("district"));
+        }
+        if ($request->has("subdistrict")) {
+            $query->subdistrict($request->input("subdistrict"));
+        }
+        if ($request->has("village")) {
+            $query->villageId($request->input("village"));
+        }
         $data = $query->get();
-        // dd($data);
         return response()->json([
             'resultSet' => $data,
             'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())
@@ -249,15 +271,26 @@ class DimasController extends Controller
      */
     public function getNumberOfVictims(Request $request,VictimQueryBuilder $query)
     {
-//        $query->status('affected');
-//        $query->ageGroup('baby');
-//        $query->isFemale();
-//        $query->refugeCamp('a refuge camp');
-//        $query->medicalFacilityType('a type');
-        $query->disasterEvent(1)->select(["victims.*"])->distinct();
-        $data = $query->get();
-        dd($data);
-        return response()->json($query->count());
+        if ($request->input("category") === "status") {
+            $query->status($request->input("valuecat"));
+        } else if ($request->input("category") === "age") {
+            $query->ageGroup($request->input("valuecat"));
+        } else if ($request->input("category") === "gender") {
+            $query->isFemale();
+        } else if ($request->input("category") === "refcamp") {
+            $query->refugeCamp($request->input("valuecat"));
+            $query->refugeCampType($request->input("type"));
+        } else {
+            $query->medicalFacility($request->input("valuecat"));
+            $query->medicalFacilityType($request->input("type"));
+        }
+        $query->disasterEvent($request->input("id"))
+        ->select([$this->db->raw("count(distinct victims.*) as count")]);
+        
+        return response()->json([
+            'resultSet' => $query->first()->count,
+            'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())
+        ]);    
     }
 
     private function createSQLRawQuery($query,$bindings){

@@ -43,6 +43,7 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
         $this->joinWithDisasterEvents();
         $this->joinWithDisasters();
         $this->joinWithDisasterAreas();
+        $this->distinct();
         $this->query
             ->where("disaster_events.id","=",$id);
         return $this;
@@ -350,5 +351,10 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
     public function bindings()
     {
         return $this->query->getBindings();
+    }
+
+    public function groupBy($column) {
+        $this->query->groupBy($column);
+        return $this;
     }
 }

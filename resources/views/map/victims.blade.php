@@ -52,7 +52,7 @@
             </div>
         </div> 
 
-        <label for="locationInput">Location</label>
+        <label for="locationInput">Victim's Origin</label>
         <div class="input-group">
             <div class="row">
                 <div class="col-md-3">
@@ -91,8 +91,32 @@
     <button type="button" class="btn btn-primary" id="executeButton">Execute!</button>
 </form>
 @endsection
+@section('counter')
+    @parent
+    <div class="col-md-6" id="rowCounter" name="rowCounter">
+        <div class="row">
+            <select class="form-control" id="counterCategory" name="counterCategory">
+                <option value="">Type unset..</option>
+                <option value="status">Status</option>
+                <option value="age">Age Group</option>
+                <option value="gender">Gender</option>
+                <option value="refcamp">Refugee Camps</option>
+                <option value="medfac">Medical Facilities</option>
+            </select>
+            <input type="text" id="catVal" name="catVal"/>   
+            <input type="text" id="type" name="type" hidden="hidden"/>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <button type="button" class="btn btn-secondary" id="buttonCount">Count</button>
+    </div>    
+    <div class="col-md-3" id="resultCount" name="resultCount">
+        
+    </div>
+@endsection
 @section('script')
 <script>
+    populateOpts();
    //get victims data from server
     var disasEventId = '{{$id}}';
     var data;
@@ -112,23 +136,118 @@
         // resultField.append(tableElement);
         for (var i = 0; i < data.length; i++) {
             var tableRow = tableElement.insertRow(i);
-            var ctr = 0;
-            for (var k in data[i]) {
-                if (k!=="region" && k!=="disaster_id" && k!=="disaster_event_id" && k!=="cause" && k!=="point" && k!=="start" && k!=="end" && k!=="victim_id" && k!=="date_start" && k!=="date_end") {
-                    var cell = tableRow.insertCell(ctr);
-                    cell.innerHTML = data[i][k];
-                    ctr++;
-                }
-            }
-            var victimMovement = tableRow.insertCell(ctr);
+            var celldata = tableRow.insertCell(0);
+            celldata.innerHTML = JSON.stringify(data[i]);
+
+            var victimMovement = tableRow.insertCell(1);
             var linkToMovement = document.createElement('a');
             linkToMovement.innerHTML = "See Movement";
-            linkToMovement.setAttribute('href', 'http://localhost:8000/map/victim_movements/' + data[i]["id"]);
+            linkToMovement.setAttribute('href', 'http://localhost:8000/map/victim_mov/' + data[i]["id"]);
             linkToMovement.setAttribute('target', '_blank');
             victimMovement.appendChild(linkToMovement);
             
         }
         resultField.append(tableElement);
+    });
+    $('#executeButton').click(function(e) {
+        var formData = {
+            year : $('#year').val(),
+            month : $('#month').val(),
+            day : $('#day').val(),
+            province : $('#province').val(),
+            district : $('#district').val(),
+            subdistrict : $('#subdistrict').val(),
+            village : $('#village').val(),
+            disasterType : $('#disasterType').val(),
+            id : disasEventId
+        };
+        console.log(formData);
+        $.ajaxSetup({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+        });
+        
+        $.ajax({
+            type : "GET",
+            url : "/dimas/victims",
+            data : formData
+        }).done(function(victimsData) {
+            console.log(victimsData);
+            $("#id").show();
+            data = victimsData.resultSet;
+            sql = victimsData.executedQuery;
+            $("#executedQuery").html(sql);
+
+            var resultField = $('div[name="resultSet"]');
+            resultField.empty();
+            var tableElement = document.createElement('table');
+            tableElement.setAttribute('id', 'resultTable');
+            // resultField.append(tableElement);
+            for (var i = 0; i < data.length; i++) {
+                var tableRow = tableElement.insertRow(i);
+                var celldata = tableRow.insertCell(0);
+                celldata.innerHTML = JSON.stringify(data[i]);
+
+                var victimMovement = tableRow.insertCell(1);
+                var linkToMovement = document.createElement('a');
+                linkToMovement.innerHTML = "See Movement";
+                linkToMovement.setAttribute('href', 'http://localhost:8000/map/victim_mov/' + data[i]["id"]);
+                linkToMovement.setAttribute('target', '_blank');
+                victimMovement.appendChild(linkToMovement);
+            }
+            resultField.append(tableElement);
+
+        }).fail(function(data) {
+            console.log('Error: ', data);
+        });
+    });
+    
+    $('#counterCategory').change(function() {
+        if ($('#counterCategory').val() === "refcamp" || $('#counterCategory').val() === "medfac") {
+            var typefield = $('input[name="type"]');
+            typefield.prop('hidden', false);
+            console.log("medfacorrefcamp");
+            var rowCounter = $('div[name="rowCounter"]');
+            var inputText = document.createElement('input');
+            inputText.setAttribute('id', 'type');
+            inputText.setAttribute('type', 'text');
+            rowCounter.append(inputText);
+        }
+    });
+
+    $('#buttonCount').click(function() {
+        var formData = {
+            category : $('#counterCategory').val(),
+            valuecat : $('#catVal').val(),
+            type : $('#type').val(),
+            id : disasEventId
+        };
+
+        $.ajaxSetup({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+        });
+        
+        $.ajax({
+            type : "GET",
+            url : "/dimas/number-of-victims",
+            data : formData
+        }).done(function(victimsData) {
+            console.log(victimsData);
+            $("#id").show();
+            data = victimsData.resultSet;
+            sql = victimsData.executedQuery;
+            $("#executedQuery").html(sql);
+            var counter = $('div[name="resultCount"]');
+            counter.empty();
+            var textcounter = document.createTextNode(data);
+            counter.append(textcounter);
+        }).fail(function(data) {
+            console.log('Error: ', data);
+        });
+
     });
 
 </script>

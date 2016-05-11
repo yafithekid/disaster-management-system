@@ -5,6 +5,8 @@ namespace App\Services;
 
 interface VictimQueryBuilder
 {
+    public function groupBy($column);
+
     /**
      * @param array $array
      * @return DisasterEventQueryBuilder
