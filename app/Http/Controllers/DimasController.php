@@ -220,6 +220,7 @@ class DimasController extends Controller
         if ($request->has("village")) {
             $query->villageId($request->input("village"));
         }
+        $query->select(["victims.*"]);
         $data = $query->get();
         return response()->json([
             'resultSet' => $data,
@@ -327,8 +328,12 @@ class DimasController extends Controller
             $query->status($request->input("valuecat"));
         } else if ($request->input("category") === "age") {
             $query->ageGroup($request->input("valuecat"));
-        } else if ($request->input("category") === "gender") {
-            $query->isFemale();
+        } else if ($request->input("category") === "gender" && $request->has("valuecat")) {
+            if ($request->input("valuecat") === "m"){
+                $query->isMale();
+            } else {
+                $query->isFemale();
+            }
         } else if ($request->input("category") === "refcamp") {
             $query->refugeCamp($request->input("valuecat"));
             $query->refugeCampType($request->input("type"));
