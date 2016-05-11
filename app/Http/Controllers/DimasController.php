@@ -325,7 +325,23 @@ class DimasController extends Controller
     public function getNumberOfVictims(Request $request,VictimQueryBuilder $query)
     {
         if ($request->input("category") === "status") {
-            $query->status($request->input("valuecat"));
+            $status = $request->input("valuecat");
+            if ($request->input("year") != ""){
+                $year = $request->input("year");
+                if ($request->input("month") != ""){
+                    $month = $request->input("month");
+                    if ($request->input("day") != ""){
+                        $day = $request->input("day");
+                        $query->statusDate($status,$year,$month,$day);
+                    } else {
+                        $query->statusMonth($status,$year,$month);
+                    }
+                } else {
+                    $query->statusYear($status,$year);
+                }
+            } else {
+                $query->status($status);
+            }
         } else if ($request->input("category") === "age") {
             $query->ageGroup($request->input("valuecat"));
         } else if ($request->input("category") === "gender" && $request->has("valuecat")) {
@@ -343,7 +359,6 @@ class DimasController extends Controller
         }
         $query->disasterEvent($request->input("id"))
         ->select([$this->db->raw("count(distinct victims.*) as count")]);
-        
         return response()->json([
             'resultSet' => $query->first()->count,
             'executedQuery' => $this->createSQLRawQuery($query->sql(),$query->bindings())

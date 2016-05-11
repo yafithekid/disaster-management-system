@@ -128,6 +128,13 @@ interface VictimQueryBuilder
      */
     public function status($status);
 
+    public function statusYear($status, $year);
+    public function statusMonth($status, $year, $month);
+    public function statusDate($status, $year, $month, $day);
+
+    public function statusPeriodDate($status,$date_start,$date_end);
+
+
     /**
      * @return VictimQueryBuilder
      */

@@ -110,7 +110,7 @@
     <div class="col-md-3">
         <button type="button" class="btn btn-secondary" id="buttonCount">Count</button>
     </div>    
-    <div class="col-md-3" id="resultCount" name="resultCount">
+    <div class="well col-md-3" id="resultCount" name="resultCount">
         
     </div>
 @endsection

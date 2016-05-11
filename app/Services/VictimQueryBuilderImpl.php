@@ -251,6 +251,7 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
             $this->join_with_victim_statuses = true;
             $this->query->join("victim_statuses","victims.id","=","victim_statuses.victim_id");
         }
+        return $this;
     }
 
     private function joinWithDisasterEvents(){
@@ -355,6 +356,34 @@ class VictimQueryBuilderImpl implements VictimQueryBuilder
 
     public function groupBy($column) {
         $this->query->groupBy($column);
+        return $this;
+    }
+
+    public function statusYear($status, $year)
+    {
+        $date_start = $this->dateService->makeStartDateFromYear($year);
+        $date_end = $this->dateService->makeEndDateFromYear($year);
+        return $this->statusPeriodDate($status,$date_start,$date_end);
+    }
+
+    public function statusMonth($status, $year, $month)
+    {
+        $date_start = $this->dateService->makeStartDateFromMonth($year,$month);
+        $date_end = $this->dateService->makeEndDateFromMonth($year,$month);
+        return $this->statusPeriodDate($status,$date_start,$date_end);
+    }
+
+    public function statusDate($status, $year, $month, $day)
+    {
+        $date = $this->dateService->makeCertainDate($year,$month,$day);
+        return $this->statusPeriodDate($status,$date,$date);
+    }
+
+    public function statusPeriodDate($status, $date_start, $date_end)
+    {
+        $this->joinWithVictimStatus();
+        $this->query->where("victim_statuses.status","=",$status);
+        $this->query->whereRaw("(victim_statuses.start,victim_statuses.end) OVERLAPS (TIMESTAMP '$date_start',TIMESTAMP '$date_end')");
         return $this;
     }
 }
