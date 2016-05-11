@@ -167,4 +167,16 @@ class VillageQueryBuilderImpl implements VillageQueryBuilder
         $this->query->distinct();
         return $this;
     }
+
+    public function disasterAreaId($id)
+    {
+        $this->joinWithDisasterAreas();
+        $this->query->where("disaster_areas.id","=",$id);
+        return $this;
+    }
+
+    public function bindings()
+    {
+        return $this->query->getBindings();
+    }
 }

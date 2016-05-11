@@ -20,15 +20,23 @@ class MapController extends Controller
         return view('map.medical_facilities');
     }
 
+
     public function getRefugeCamps(){
         return view('map.refuge_camps');
     }
 
-    public function getVictims($id) {
+    public function getVictims($id)
+    {
         return view('map.victims', ['id' => $id]);
     }
-    
+
+
     public function getVictimMovements(){
     	return view('map.victim_movements');
+    }
+    
+    public function getAffectedVillages($disaster_event_id)
+    {
+        return view('map.affected_villages',compact('disaster_event_id'));
     }
 }

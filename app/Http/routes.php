@@ -14,7 +14,9 @@
 Route::get('/draw',['uses'=>'InputController@getDraw']);
 
 Route::get('/map/disaster_event',['uses'=>'MapController@getDisasterEvent']);
+//id - disaster event id
 Route::get('/map/disaster_changes/{id}',['uses'=>'MapController@getDisasterChanges']);
+Route::get('/map/affected_villages/{disaster_event_id}',['uses'=>'MapController@getAffectedVillages']);
 Route::get('/map/med_fac',['uses'=>'MapController@getMedicalFacilities']);
 Route::get('/map/victims/{id}', ['uses' => 'MapController@getVictims']);
 Route::get('/map/victim_mov',['uses'=>'MapController@getVictimMovements']);
@@ -40,6 +42,7 @@ Route::get('/test',['uses'=>'Auth\AuthController@test']);
 Route::get('/dimas/disaster-events',['uses'=>'DimasController@getDisasterEvents']);
 Route::get('/dimas/disaster-event-changes',['uses'=>'DimasController@getDisasterEventChanges']);
 Route::get('/dimas/victim-movements/{id}',['uses'=>'DimasController@getVictimMovements']);
+Route::get('/dimas/aggregated-areas/{disaster_event_id}',['uses'=>'DimasController@getAggregatedAreas']);
 Route::get('/dimas/villages-affected',['uses'=>'DimasController@getVillagesAffected']);
 Route::get('/dimas/victims',['uses'=>'DimasController@getVictims']);
 Route::get('/dimas/refuge-camps',['uses'=>'DimasController@getRefugeCamps']);

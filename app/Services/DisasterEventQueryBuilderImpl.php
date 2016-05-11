@@ -41,12 +41,13 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
 
     public function periodDate($date_start, $date_end)
     {
-        $this->query->where(function($q) use ($date_end,$date_start) {
-                $q->where("date_start",">=",$date_start)->where("date_start","<=",$date_end)
-            ->orWhere(function($q) use ($date_end,$date_start) {
-                $q->where("date_end",">=",$date_start)->where("date_end","<=",$date_end);
-            });
-        });
+        $this->query->whereRaw("(disaster_events.date_start,disaster_events.date_end) OVERLAPS (TIMESTAMP '$date_start', TIMESTAMP '$date_end')");
+//        $this->query->where(function($q) use ($date_end,$date_start) {
+//                $q->where("date_start",">=",$date_start)->where("date_start","<=",$date_end)
+//            ->orWhere(function($q) use ($date_end,$date_start) {
+//                $q->where("date_end",">=",$date_start)->where("date_end","<=",$date_end);
+//            });
+//        });
         return $this;
     }
 
