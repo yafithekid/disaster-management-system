@@ -16,22 +16,24 @@
         $.get( "/dimas/victim-movements/"+victimId, function( data ) {
             var coordinates = [];
             var x,y;            
+            var resultTable = createResultTable();
             victimData = data.resultSet;
             sql = data.executedQuery;
-            
+
             if(layerGroup.getLayers().length>0){
-                layerGroup.clearLayers();
+                layerGroup.clearLayers(addTypeDiv(victimData[0]));
             }
 
-            $("#resultSet").append(addTypeDiv(victimData[0]));
+            var resultTableBody = resultTable.find("tbody");
+            resultTableBody.append(addTypeRow(victimData[0]));
             victimData.forEach(function(datum){
                 var marker = new L.geoJson(datum.point);
                 x = datum.point.coordinates[1];
                 y = datum.point.coordinates[0];
                 coordinates.push([x,y]);
                 layerGroup.addLayer(marker);
-                var datumDiv = addDatumDiv(datum);
-                $("#resultSet").append(datumDiv);
+                var datumTr = addDatumRow(datum);
+                resultTableBody.append(datumTr);
             }); 
             
             mymap.setZoom(4);
@@ -41,41 +43,49 @@
             layerGroup.addLayer(pathline);
             layerGroup.addTo(mymap);
             $("#executedQuery").html(sql);
+            $("#resultSet").append(resultTable);
         });
     }
 
-    function addTypeDiv( data ){
-        var div = $(document.createElement('div'));
-        div.attr("class","row");
-        div.css("background-color",'#CCC');
-        div.css("border","1px solid #AAA");
-        for (var key in data){
-            var tempDiv = $(document.createElement('div'));
-            tempDiv.attr("id",key);
-            tempDiv.attr("class","col-md-1");
-            tempDiv.append(key);
-            div.append(tempDiv);
-        }
-        return div;
+    function createResultTable(){
+        var table = $(document.createElement('table'));
+        table.attr("class","table table-striped table-condensed");
+        table.append($(document.createElement('tbody')))
+        return table;
     }
-    function addDatumDiv( data ){
-        var div = $(document.createElement('div'));
-        div.attr("class","row");
-        div.css("background-color",'#DDD');
-        div.css("border","1px solid #AAA");
+
+    function addTypeRow( data ){
+        var tr = $(document.createElement('tr'));
+        // div.attr("class","row");
+        // div.css("background-color",'#CCC');
+        // tr.css("border","1px solid black");
         for (var key in data){
-            var tempDiv = $(document.createElement('div'));
-            tempDiv.attr("id",key);
-            tempDiv.attr("class","col-md-1");
+            var tempTh = $(document.createElement('th'));
+            // tempTh.attr("id",key);
+            // tempTh.attr("class","col-md-1");
+            tempTh.append(key);
+            tr.append(tempTh);
+        }
+        return tr;
+    }
+    function addDatumRow( data ){
+        var tableRow = $(document.createElement('tr'));
+        // div.attr("class","row");
+        // div.css("background-color",'#DDD');
+        // div.css("border","1px solid #AAA");
+        for (var key in data){
+            var tempTd = $(document.createElement('td'));
+            // tempDiv.attr("id",key);
+            // tempDiv.attr("class","col-md-1");
             if(key=='point'){
-                tempDiv.append(data[key].coordinates);
+                tempTd.append(data[key].coordinates);
             }
             else{
-                tempDiv.append(data[key]);
+                tempTd.append(data[key]);
             }
-            div.append(tempDiv);    
+            tableRow.append(tempTd);    
         }
-        return div;
+        return tableRow;
     }
     $("#resultSet").css("padding-bottom", "10px");
 </script>
