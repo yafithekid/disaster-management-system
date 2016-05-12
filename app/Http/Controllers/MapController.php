@@ -12,9 +12,10 @@ class MapController extends Controller
         return view('map.disaster_event');
     }
 
-    public function getDisasterChanges($id)
+    public function getDisasterChanges($id,DisasterEventQueryBuilder $query)
     {
-        return view('map.disaster_changes',['id'=>$id]);
+        $disasters = $query->id($id)->joinWithDisasters()->get();
+        return view('map.disaster_changes',['id'=>$id,'disasters' =>$disasters]);
     }
 
     public function getMedicalFacilities(){

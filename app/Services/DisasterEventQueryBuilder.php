@@ -143,5 +143,7 @@ interface DisasterEventQueryBuilder
     public function periodYear($year_start, $year_end);
 
     public function periodFromString($period);
+    
+    public function disasterId($disaster_id);
 
 }

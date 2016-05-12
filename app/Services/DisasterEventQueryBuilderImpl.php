@@ -136,6 +136,7 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
             $this->join_with_disasters = true;
             $this->query->join("disasters","disaster_events.id","=","disasters.disaster_event_id");
         }
+        return $this;
     }
 
     public function joinWithDisasterAreas(){
@@ -205,4 +206,10 @@ class DisasterEventQueryBuilderImpl implements DisasterEventQueryBuilder
         return $this->periodDate($startDate, $endDate);
     }
 
+    public function disasterId($disaster_id)
+    {
+        $this->joinWithDisasters();
+        $this->query->where("disasters.id","=",$disaster_id);
+        return $this;
+    }
 }

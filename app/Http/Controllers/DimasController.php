@@ -107,7 +107,11 @@ class DimasController extends Controller
     {
         $query->joinWithDisasterAreas()->orderBy("disaster_areas.start","asc");
         $query->id($request->input("id"));
+        if ($request->input("disaster_id")){
+            $query->disasterId($request->input("disaster_id"));
+        }
         $query->select([
+            "disasters.type",
             $this->db->raw("ST_AsGeoJSON(ST_Centroid(disaster_areas.region)) AS centroid"),
             "disaster_events.*","disaster_areas.*",$this->db->raw("ST_AsGeoJSON(disaster_areas.region) AS region")
         ]);
